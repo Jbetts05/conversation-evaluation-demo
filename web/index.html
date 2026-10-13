@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Conversation Lab</title>
+  <script>
+    (() => {
+      const param = new URLSearchParams(window.location.search).get("scoutTheme");
+      const theme =
+        param || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+      document.documentElement.setAttribute("data-theme", theme);
+    })();
+  </script>
+  <script>if (!new URLSearchParams(window.location.search).has("scoutTheme")) document.documentElement.setAttribute("data-theme", "light");</script>
+  <style>
+    :root {
+      color-scheme: light;
+      --cp-bg: #f7f4ef;
+      --cp-bg-elevated: #fcfbf8;
+      --cp-surface: #ffffff;
+      --cp-surface-soft: #f5f5f5;
+      --cp-border: #dedede;
+      --cp-border-strong: #919191;
+      --cp-text: #242424;
+      --cp-text-muted: #5c5c5c;
+      --cp-text-soft: #6f6f6f;
+      --cp-accent: #b11f4b;
+      --cp-accent-hover: #9a1a41;
+      --cp-accent-soft: rgba(177, 31, 75, 0.08);
+      --cp-accent-fg: #ffffff;
+      --cp-success: #16a34a;
+      --cp-danger: #dc2626;
+      --cp-warning: #f59e0b;
+      --cp-link: #0078d4;
+      --cp-shadow: 0 18px 48px rgba(0, 0, 0, 0.12);
+      --cp-overlay: rgba(255, 255, 255, 0.8);
+      --cp-panel: rgba(255, 255, 255, 0.86);
+      --cp-panel-strong: rgba(255, 255, 255, 0.96);
+      --cp-sheen: rgba(255, 255, 255, 0.55);
+      --cp-highlight: rgba(177, 31, 75, 0.12);
+    }
+    html[data-theme="dark"] {
+      color-scheme: dark;
+      --cp-bg: #3d3b3a;
+      --cp-bg-elevated: #343231;
+      --cp-surface: #292929;
+      --cp-surface-soft: #2e2e2e;
+      --cp-border: #474747;
+      --cp-border-strong: #5f5f5f;
+      --cp-text: #dedede;
+      --cp-text-muted: #919191;
+      --cp-text-soft: #b0b0b0;
+      --cp-accent: #fd8ea1;
+      --cp-accent-hover: #fb7b91;
+      --cp-accent-soft: rgba(253, 142, 161, 0.14);
+      --cp-accent-fg: #1a1a1a;
+      --cp-success: #4ade80;
+      --cp-danger: #f87171;
+      --cp-warning: #fbbf24;
+      --cp-link: #4da6ff;
+      --cp-shadow: 0 18px 48px rgba(0, 0, 0, 0.32);
+      --cp-overlay: rgba(41, 41, 41, 0.88);
+      --cp-panel: rgba(41, 41, 41, 0.72);
+      --cp-panel-strong: rgba(41, 41, 41, 0.96);
+      --cp-sheen: rgba(255, 255, 255, 0.04);
+      --cp-highlight: rgba(253, 142, 161, 0.12);
+    }
+  </style>
+  <link rel="stylesheet" href="/styles.css">
+  <script src="/app.js" defer></script>
+</head>
+<body>
+  <div class="page">
+    <header>
+      <div class="wordmark"><span class="mark" aria-hidden="true"></span>Conversation Lab</div>
+      <span class="header-note">Microsoft Foundry · no sign-in</span>
+    </header>
+    <main>
+      <section class="hero">
+        <span class="eyebrow">Beyond the last answer</span>
+        <h1>Good answers.<br>A good conversation?</h1>
+        <p>Explore what changes when you evaluate the whole interaction.</p>
+      </section>
+      <div class="mode-switch" role="group" aria-label="Conversation source">
+        <button id="examples-mode" class="selected" aria-pressed="true">Examples</button>
+        <button id="chat-mode" aria-pressed="false">Live chat</button>
+      </div>
+      <section class="workspace" aria-label="Conversation workspace">
+        <div class="conversation-panel panel">
+          <div id="example-controls" class="controls">
+            <div class="field"><label for="scenario">Choose a conversation</label><select id="scenario" disabled><option>Loading examples...</option></select></div>
+            <div class="field"><label for="variant">Version</label><select id="variant"><option value="faulty">Faulty · authored</option><option value="well-handled">Well handled · authored</option></select></div>
+          </div>
+          <div class="conversation-heading">
+            <div><h2 id="conversation-title">Loading conversation</h2><p id="conversation-meta" class="muted"></p></div>
+            <button id="export-transcript" class="quiet" disabled>Export JSONL</button>
+          </div>
+          <div id="messages" class="messages" aria-live="polite"></div>
+          <form id="chat-form" hidden>
+            <label for="chat-input">Your message</label>
+            <textarea id="chat-input" rows="3" maxlength="6000" placeholder="Try a billing question, switch to roaming, then return to billing." required></textarea>
+            <div class="chat-actions"><span id="chat-metrics" class="muted"></span><button id="send-chat" type="submit">Send</button></div>
+          </form>
+          <details class="inspector">
+            <summary>Transcript · instructions · expected outcomes</summary>
+            <p class="muted">All telecom facts are fictional. Expected outcomes are authored references, not measured scores.</p>
+            <h3>System instructions</h3><pre id="system-instructions"></pre>
+            <h3>Expected outcomes</h3><div id="expected-outcomes"></div>
+            <h3>Edit or import a transcript</h3>
+            <label for="json-editor">Conversation JSON</label>
+            <textarea id="json-editor" rows="10" spellcheck="false"></textarea>
+            <div class="detail-actions">
+              <button id="apply-edit" class="secondary">Apply edit</button>
+              <label class="file-button" for="import-file">Import JSONL</label><input id="import-file" type="file" accept=".jsonl,.json,.txt" hidden>
+            </div>
+            <label class="checkbox"><input id="include-holdout" type="checkbox"> Show reserved holdout examples (do not use these for rubric tuning)</label>
+          </details>
+        </div>
+        <aside class="guide-panel panel">
+          <span class="eyebrow">Two perspectives</span>
+          <h2>The reply.<br>The journey.</h2>
+          <p>Did each answer address the question? Did the conversation accomplish what the user actually needed?</p>
+          <div class="perspective"><span class="step">01</span><div><h3>Turn by turn</h3><p>Relevance and intent resolution.</p></div></div>
+          <div class="perspective"><span class="step">02</span><div><h3>Whole conversation</h3><p>Completion, satisfaction, coherence and a multi-topic rubric.</p></div></div>
+          <div class="run-actions">
+            <button id="evaluate" class="primary" disabled>Evaluate conversation <span aria-hidden="true">↗</span></button>
+            <button id="compare" class="secondary" disabled>Compare both versions</button>
+            <button id="recorded" class="quiet">View a recorded Foundry run</button>
+          </div>
+          <p id="status" class="status" role="status" aria-live="polite">Loading...</p>
+          <p class="privacy">Evaluation sends this transcript to Foundry and retains the run there. Evaluated snapshots stay in this browser tab for resume/export. Use fictional or non-sensitive data.</p>
+          <details class="inspector">
+            <summary>Judge · rubric · configuration</summary>
+            <p id="configuration" class="muted"></p>
+            <p class="muted">Rubric evaluation is preview and model-judged. Scores are not ground truth or a customer benchmark.</p>
+            <div id="rubric"></div>
+          </details>
+        </aside>
+      </section>
+      <section class="results-section" aria-labelledby="results-title">
+        <div class="section-heading"><div><span class="eyebrow">The assessment</span><h2 id="results-title">One transcript. Two perspectives.</h2></div><button id="export-report" class="quiet" disabled>Download report</button></div>
+        <p id="results-warning" class="warning" hidden></p>
+        <div id="results" class="results-grid">
+          <article class="result-card panel"><span class="eyebrow">Turn by turn</span><h3>Ready to evaluate</h3><p class="muted">Response-level results appear here.</p></article>
+          <article class="result-card panel"><span class="eyebrow">Whole conversation</span><h3>Look beyond the final answer</h3><p class="muted">Outcomes, context and topic handling appear here.</p></article>
+        </div>
+      </section>
+      <footer>Real Foundry runs · fictional examples · no invented scores</footer>
+      <noscript>JavaScript is required to use Conversation Lab.</noscript>
+    </main>
+  </div>
+</body>
+</html>

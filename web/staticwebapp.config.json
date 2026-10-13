@@ -1,0 +1,10 @@
+{
+  "platform": {
+    "apiRuntime": "node:22"
+  },
+  "globalHeaders": {
+    "X-Content-Type-Options": "nosniff",
+    "Referrer-Policy": "no-referrer",
+    "Content-Security-Policy": "default-src 'self'; script-src 'self' 'sha256-Ymju0VsPL2ywxTgTwUDsc9TRGuIg71FUgo6NYHfncKc=' 'sha256-nzDp6kf6A8Xdo9GIPVlpvYQlT38PP5Sxr4F0LMB8qeg='; style-src 'self' 'sha256-5o/knZlony+KC38A7QJTx4MsaMGy7+I/6ohfKNg6Ffw='; object-src 'none'; base-uri 'self'"
+  }
+}

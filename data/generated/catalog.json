@@ -1,0 +1,1302 @@
+{
+  "version": "1",
+  "source": "authored-synthetic",
+  "conversations": [
+    {
+      "conversation_id": "conversation-v1-001",
+      "scenario_id": "billing-baseline",
+      "title": "Explain a bill",
+      "split": "calibration",
+      "variant": "well-handled",
+      "focus_dimension": "evidence_and_action_integrity",
+      "transcript_sha256": "706866b9ae69789ddc7a31026391cab72c5187fa5f0e5239f2890b53e65853eb",
+      "turns": [
+        {
+          "id": "bill-reason",
+          "topic": "billing",
+          "start": 1,
+          "end": 3
+        },
+        {
+          "id": "recurrence",
+          "topic": "billing",
+          "start": 3,
+          "end": 5
+        }
+      ],
+      "expected_outcomes": [
+        {
+          "id": "explain-charge",
+          "description": "Explain the GBP 6 difference using the supplied bill facts.",
+          "evidenceTurns": [
+            "bill-reason"
+          ]
+        },
+        {
+          "id": "recurrence",
+          "description": "Explain that the extra charge is one-off, not a recurring subscription.",
+          "evidenceTurns": [
+            "recurrence"
+          ]
+        }
+      ],
+      "authored_expectation": {
+        "focus_score": {
+          "min": 4,
+          "max": 5
+        },
+        "violated_outcome": null,
+        "fault_turn": null,
+        "explanation": null,
+        "measured": false
+      }
+    },
+    {
+      "conversation_id": "conversation-v1-002",
+      "scenario_id": "billing-baseline",
+      "title": "Explain a bill",
+      "split": "calibration",
+      "variant": "faulty",
+      "focus_dimension": "evidence_and_action_integrity",
+      "transcript_sha256": "ff8095c08dcbaafaa8b1409dc61834885634d95abaf12c90b31a48c2f80bb868",
+      "turns": [
+        {
+          "id": "bill-reason",
+          "topic": "billing",
+          "start": 1,
+          "end": 3
+        },
+        {
+          "id": "recurrence",
+          "topic": "billing",
+          "start": 3,
+          "end": 5
+        }
+      ],
+      "expected_outcomes": [
+        {
+          "id": "explain-charge",
+          "description": "Explain the GBP 6 difference using the supplied bill facts.",
+          "evidenceTurns": [
+            "bill-reason"
+          ]
+        },
+        {
+          "id": "recurrence",
+          "description": "Explain that the extra charge is one-off, not a recurring subscription.",
+          "evidenceTurns": [
+            "recurrence"
+          ]
+        }
+      ],
+      "authored_expectation": {
+        "focus_score": {
+          "min": 1,
+          "max": 2
+        },
+        "violated_outcome": "recurrence",
+        "fault_turn": "recurrence",
+        "explanation": "The response contradicts the supplied one-off charge policy.",
+        "measured": false
+      }
+    },
+    {
+      "conversation_id": "conversation-v1-003",
+      "scenario_id": "resolved-topic-switch",
+      "title": "Finish billing, then discuss roaming",
+      "split": "calibration",
+      "variant": "well-handled",
+      "focus_dimension": "topic_switching",
+      "transcript_sha256": "fe87cffa1143210ce315b9a259de1cee45cf959206942a11c9d12bd01d7ccfb5",
+      "turns": [
+        {
+          "id": "billing",
+          "topic": "billing",
+          "start": 1,
+          "end": 3
+        },
+        {
+          "id": "switch",
+          "topic": "roaming",
+          "start": 3,
+          "end": 5
+        }
+      ],
+      "expected_outcomes": [
+        {
+          "id": "billing-resolved",
+          "description": "Explain the bill before moving on.",
+          "evidenceTurns": [
+            "billing"
+          ]
+        },
+        {
+          "id": "follow-switch",
+          "description": "Answer the new France roaming question, including the activation path.",
+          "evidenceTurns": [
+            "switch"
+          ]
+        }
+      ],
+      "authored_expectation": {
+        "focus_score": {
+          "min": 4,
+          "max": 5
+        },
+        "violated_outcome": null,
+        "fault_turn": null,
+        "explanation": null,
+        "measured": false
+      }
+    },
+    {
+      "conversation_id": "conversation-v1-004",
+      "scenario_id": "resolved-topic-switch",
+      "title": "Finish billing, then discuss roaming",
+      "split": "calibration",
+      "variant": "faulty",
+      "focus_dimension": "topic_switching",
+      "transcript_sha256": "25577ef51705b224fce0ec532b6742b4d44709b59d9837912f0c483214eea903",
+      "turns": [
+        {
+          "id": "billing",
+          "topic": "billing",
+          "start": 1,
+          "end": 3
+        },
+        {
+          "id": "switch",
+          "topic": "roaming",
+          "start": 3,
+          "end": 5
+        }
+      ],
+      "expected_outcomes": [
+        {
+          "id": "billing-resolved",
+          "description": "Explain the bill before moving on.",
+          "evidenceTurns": [
+            "billing"
+          ]
+        },
+        {
+          "id": "follow-switch",
+          "description": "Answer the new France roaming question, including the activation path.",
+          "evidenceTurns": [
+            "switch"
+          ]
+        }
+      ],
+      "authored_expectation": {
+        "focus_score": {
+          "min": 1,
+          "max": 2
+        },
+        "violated_outcome": "follow-switch",
+        "fault_turn": "switch",
+        "explanation": "Accurate billing information is repeated instead of addressing the explicitly new topic.",
+        "measured": false
+      }
+    },
+    {
+      "conversation_id": "conversation-v1-005",
+      "scenario_id": "return-to-billing",
+      "title": "Billing, roaming, then back to billing",
+      "split": "calibration",
+      "variant": "well-handled",
+      "focus_dimension": "context_retention",
+      "transcript_sha256": "baa28d7b4e362e2260be817b376333d33bd053c0711f8077e32613f1d344b68d",
+      "turns": [
+        {
+          "id": "bill",
+          "topic": "billing",
+          "start": 1,
+          "end": 3
+        },
+        {
+          "id": "germany",
+          "topic": "roaming",
+          "start": 3,
+          "end": 5
+        },
+        {
+          "id": "return",
+          "topic": "billing",
+          "start": 5,
+          "end": 7
+        }
+      ],
+      "expected_outcomes": [
+        {
+          "id": "future-rate",
+          "description": "State Germany's future daily rate separately from the historic bill.",
+          "evidenceTurns": [
+            "germany"
+          ]
+        },
+        {
+          "id": "recover-bill",
+          "description": "Recover June's GBP 6 one-off charge when the user returns to billing.",
+          "evidenceTurns": [
+            "bill",
+            "return"
+          ]
+        }
+      ],
+      "authored_expectation": {
+        "focus_score": {
+          "min": 4,
+          "max": 5
+        },
+        "violated_outcome": null,
+        "fault_turn": null,
+        "explanation": null,
+        "measured": false
+      }
+    },
+    {
+      "conversation_id": "conversation-v1-006",
+      "scenario_id": "return-to-billing",
+      "title": "Billing, roaming, then back to billing",
+      "split": "calibration",
+      "variant": "faulty",
+      "focus_dimension": "context_retention",
+      "transcript_sha256": "fa656de538caf6bea07e5445c746511fc4ebb3712b11e876a805b78823e9ef76",
+      "turns": [
+        {
+          "id": "bill",
+          "topic": "billing",
+          "start": 1,
+          "end": 3
+        },
+        {
+          "id": "germany",
+          "topic": "roaming",
+          "start": 3,
+          "end": 5
+        },
+        {
+          "id": "return",
+          "topic": "billing",
+          "start": 5,
+          "end": 7
+        }
+      ],
+      "expected_outcomes": [
+        {
+          "id": "future-rate",
+          "description": "State Germany's future daily rate separately from the historic bill.",
+          "evidenceTurns": [
+            "germany"
+          ]
+        },
+        {
+          "id": "recover-bill",
+          "description": "Recover June's GBP 6 one-off charge when the user returns to billing.",
+          "evidenceTurns": [
+            "bill",
+            "return"
+          ]
+        }
+      ],
+      "authored_expectation": {
+        "focus_score": {
+          "min": 1,
+          "max": 2
+        },
+        "violated_outcome": "recover-bill",
+        "fault_turn": "return",
+        "explanation": "The agent substitutes the newer Germany rate for the earlier bill facts.",
+        "measured": false
+      }
+    },
+    {
+      "conversation_id": "conversation-v1-007",
+      "scenario_id": "resume-unfinished-request",
+      "title": "Resume a request after an interruption",
+      "split": "calibration",
+      "variant": "well-handled",
+      "focus_dimension": "request_coverage",
+      "transcript_sha256": "2427c5077b8902ace2fc9b5068f9d0d895e772f447b90f4e66a9b006aab3f243",
+      "turns": [
+        {
+          "id": "pending",
+          "topic": "billing",
+          "start": 1,
+          "end": 3
+        },
+        {
+          "id": "interrupt",
+          "topic": "roaming",
+          "start": 3,
+          "end": 5
+        },
+        {
+          "id": "resume",
+          "topic": "billing",
+          "start": 5,
+          "end": 7
+        },
+        {
+          "id": "closing",
+          "topic": "roaming",
+          "start": 7,
+          "end": 9
+        }
+      ],
+      "expected_outcomes": [
+        {
+          "id": "roaming-answer",
+          "description": "Answer the interrupting France question and provide the activation path when requested.",
+          "evidenceTurns": [
+            "interrupt",
+            "resume"
+          ]
+        },
+        {
+          "id": "resume-dispute",
+          "description": "Use the supplied date to finish the requested dispute instructions.",
+          "evidenceTurns": [
+            "pending",
+            "resume"
+          ]
+        }
+      ],
+      "authored_expectation": {
+        "focus_score": {
+          "min": 4,
+          "max": 5
+        },
+        "violated_outcome": null,
+        "fault_turn": null,
+        "explanation": null,
+        "measured": false
+      }
+    },
+    {
+      "conversation_id": "conversation-v1-008",
+      "scenario_id": "resume-unfinished-request",
+      "title": "Resume a request after an interruption",
+      "split": "calibration",
+      "variant": "faulty",
+      "focus_dimension": "request_coverage",
+      "transcript_sha256": "f1bc6535867240442d97a7d8260634d12912e4d94f5be8afa3a8a7a1fdf486d6",
+      "turns": [
+        {
+          "id": "pending",
+          "topic": "billing",
+          "start": 1,
+          "end": 3
+        },
+        {
+          "id": "interrupt",
+          "topic": "roaming",
+          "start": 3,
+          "end": 5
+        },
+        {
+          "id": "resume",
+          "topic": "billing",
+          "start": 5,
+          "end": 7
+        },
+        {
+          "id": "closing",
+          "topic": "roaming",
+          "start": 7,
+          "end": 9
+        }
+      ],
+      "expected_outcomes": [
+        {
+          "id": "roaming-answer",
+          "description": "Answer the interrupting France question and provide the activation path when requested.",
+          "evidenceTurns": [
+            "interrupt",
+            "resume"
+          ]
+        },
+        {
+          "id": "resume-dispute",
+          "description": "Use the supplied date to finish the requested dispute instructions.",
+          "evidenceTurns": [
+            "pending",
+            "resume"
+          ]
+        }
+      ],
+      "authored_expectation": {
+        "focus_score": {
+          "min": 1,
+          "max": 2
+        },
+        "violated_outcome": "resume-dispute",
+        "fault_turn": "resume",
+        "explanation": "The newest question and the final thanks both receive correct answers, but the explicit earlier obligation to finish dispute instructions is silently dropped.",
+        "measured": false
+      }
+    },
+    {
+      "conversation_id": "conversation-v1-009",
+      "scenario_id": "withdrawn-request",
+      "title": "Respect an explicitly abandoned topic",
+      "split": "calibration",
+      "variant": "well-handled",
+      "focus_dimension": "request_coverage",
+      "transcript_sha256": "79c2bebe70324518faf50be35b2be890f08e6e40b5605c6c0856ed6d0d6bd3dd",
+      "turns": [
+        {
+          "id": "request",
+          "topic": "billing",
+          "start": 1,
+          "end": 3
+        },
+        {
+          "id": "withdraw",
+          "topic": "roaming",
+          "start": 3,
+          "end": 5
+        },
+        {
+          "id": "finish",
+          "topic": "roaming",
+          "start": 5,
+          "end": 7
+        }
+      ],
+      "expected_outcomes": [
+        {
+          "id": "respect-withdrawal",
+          "description": "Leave the dispute withdrawn; do not invent a pending task or open a dispute.",
+          "evidenceTurns": [
+            "withdraw",
+            "finish"
+          ]
+        },
+        {
+          "id": "answer-current-topic",
+          "description": "Answer the remaining France question.",
+          "evidenceTurns": [
+            "withdraw"
+          ]
+        }
+      ],
+      "authored_expectation": {
+        "focus_score": {
+          "min": 4,
+          "max": 5
+        },
+        "violated_outcome": null,
+        "fault_turn": null,
+        "explanation": null,
+        "measured": false
+      }
+    },
+    {
+      "conversation_id": "conversation-v1-010",
+      "scenario_id": "withdrawn-request",
+      "title": "Respect an explicitly abandoned topic",
+      "split": "calibration",
+      "variant": "faulty",
+      "focus_dimension": "request_coverage",
+      "transcript_sha256": "cb7710fa425ab15efc73890293f8ebe03065f323a518f7b2090486518e4cb27a",
+      "turns": [
+        {
+          "id": "request",
+          "topic": "billing",
+          "start": 1,
+          "end": 3
+        },
+        {
+          "id": "withdraw",
+          "topic": "roaming",
+          "start": 3,
+          "end": 5
+        },
+        {
+          "id": "finish",
+          "topic": "roaming",
+          "start": 5,
+          "end": 7
+        }
+      ],
+      "expected_outcomes": [
+        {
+          "id": "respect-withdrawal",
+          "description": "Leave the dispute withdrawn; do not invent a pending task or open a dispute.",
+          "evidenceTurns": [
+            "withdraw",
+            "finish"
+          ]
+        },
+        {
+          "id": "answer-current-topic",
+          "description": "Answer the remaining France question.",
+          "evidenceTurns": [
+            "withdraw"
+          ]
+        }
+      ],
+      "authored_expectation": {
+        "focus_score": {
+          "min": 1,
+          "max": 2
+        },
+        "violated_outcome": "respect-withdrawal",
+        "fault_turn": "finish",
+        "explanation": "The agent revives a withdrawn request and fabricates an account action.",
+        "measured": false
+      }
+    },
+    {
+      "conversation_id": "conversation-v1-011",
+      "scenario_id": "corrected-trip",
+      "title": "Remember a correction across topics",
+      "split": "calibration",
+      "variant": "well-handled",
+      "focus_dimension": "correction_handling",
+      "transcript_sha256": "433e846ec58f6d6a879aef0ea029b0275cbf8a8d7eabfbce66af65f34fa74970",
+      "turns": [
+        {
+          "id": "original",
+          "topic": "travel",
+          "start": 1,
+          "end": 3
+        },
+        {
+          "id": "correction",
+          "topic": "travel",
+          "start": 3,
+          "end": 5
+        },
+        {
+          "id": "billing",
+          "topic": "billing",
+          "start": 5,
+          "end": 7
+        },
+        {
+          "id": "recap",
+          "topic": "travel",
+          "start": 7,
+          "end": 9
+        }
+      ],
+      "expected_outcomes": [
+        {
+          "id": "plan-charge",
+          "description": "Answer the intervening plan-charge question.",
+          "evidenceTurns": [
+            "billing"
+          ]
+        },
+        {
+          "id": "latest-date",
+          "description": "Retain France and five days while replacing 3 June with 4 July.",
+          "evidenceTurns": [
+            "correction",
+            "recap"
+          ]
+        }
+      ],
+      "authored_expectation": {
+        "focus_score": {
+          "min": 4,
+          "max": 5
+        },
+        "violated_outcome": null,
+        "fault_turn": null,
+        "explanation": null,
+        "measured": false
+      }
+    },
+    {
+      "conversation_id": "conversation-v1-012",
+      "scenario_id": "corrected-trip",
+      "title": "Remember a correction across topics",
+      "split": "calibration",
+      "variant": "faulty",
+      "focus_dimension": "correction_handling",
+      "transcript_sha256": "8125345190aa818ab15a12c20f8bc1153ec5fbdb4aef6f280b039ba7275530dd",
+      "turns": [
+        {
+          "id": "original",
+          "topic": "travel",
+          "start": 1,
+          "end": 3
+        },
+        {
+          "id": "correction",
+          "topic": "travel",
+          "start": 3,
+          "end": 5
+        },
+        {
+          "id": "billing",
+          "topic": "billing",
+          "start": 5,
+          "end": 7
+        },
+        {
+          "id": "recap",
+          "topic": "travel",
+          "start": 7,
+          "end": 9
+        }
+      ],
+      "expected_outcomes": [
+        {
+          "id": "plan-charge",
+          "description": "Answer the intervening plan-charge question.",
+          "evidenceTurns": [
+            "billing"
+          ]
+        },
+        {
+          "id": "latest-date",
+          "description": "Retain France and five days while replacing 3 June with 4 July.",
+          "evidenceTurns": [
+            "correction",
+            "recap"
+          ]
+        }
+      ],
+      "authored_expectation": {
+        "focus_score": {
+          "min": 1,
+          "max": 2
+        },
+        "violated_outcome": "latest-date",
+        "fault_turn": "recap",
+        "explanation": "An acknowledged correction is lost after the intervening billing topic.",
+        "measured": false
+      }
+    },
+    {
+      "conversation_id": "conversation-v1-013",
+      "scenario_id": "separate-travellers",
+      "title": "Keep two travellers' details separate",
+      "split": "calibration",
+      "variant": "well-handled",
+      "focus_dimension": "context_separation",
+      "transcript_sha256": "228b6a09c67ee1a5796afea5fa871e1bb5536969689d4a6bbdc774fa8a158e91",
+      "turns": [
+        {
+          "id": "travellers",
+          "topic": "travel",
+          "start": 1,
+          "end": 3
+        },
+        {
+          "id": "billing",
+          "topic": "billing",
+          "start": 3,
+          "end": 5
+        },
+        {
+          "id": "recap",
+          "topic": "travel",
+          "start": 5,
+          "end": 7
+        }
+      ],
+      "expected_outcomes": [
+        {
+          "id": "base-charge",
+          "description": "Keep the monthly plan separate from trip-specific charges.",
+          "evidenceTurns": [
+            "billing"
+          ]
+        },
+        {
+          "id": "entity-boundaries",
+          "description": "Preserve each traveller's destination, duration, and computed charge.",
+          "evidenceTurns": [
+            "travellers",
+            "recap"
+          ]
+        }
+      ],
+      "authored_expectation": {
+        "focus_score": {
+          "min": 4,
+          "max": 5
+        },
+        "violated_outcome": null,
+        "fault_turn": null,
+        "explanation": null,
+        "measured": false
+      }
+    },
+    {
+      "conversation_id": "conversation-v1-014",
+      "scenario_id": "separate-travellers",
+      "title": "Keep two travellers' details separate",
+      "split": "calibration",
+      "variant": "faulty",
+      "focus_dimension": "context_separation",
+      "transcript_sha256": "84292b0fe28cc4f33267b7506e3d55651de4fdb16c0c2a8242bb16dc596df84e",
+      "turns": [
+        {
+          "id": "travellers",
+          "topic": "travel",
+          "start": 1,
+          "end": 3
+        },
+        {
+          "id": "billing",
+          "topic": "billing",
+          "start": 3,
+          "end": 5
+        },
+        {
+          "id": "recap",
+          "topic": "travel",
+          "start": 5,
+          "end": 7
+        }
+      ],
+      "expected_outcomes": [
+        {
+          "id": "base-charge",
+          "description": "Keep the monthly plan separate from trip-specific charges.",
+          "evidenceTurns": [
+            "billing"
+          ]
+        },
+        {
+          "id": "entity-boundaries",
+          "description": "Preserve each traveller's destination, duration, and computed charge.",
+          "evidenceTurns": [
+            "travellers",
+            "recap"
+          ]
+        }
+      ],
+      "authored_expectation": {
+        "focus_score": {
+          "min": 1,
+          "max": 2
+        },
+        "violated_outcome": "entity-boundaries",
+        "fault_turn": "recap",
+        "explanation": "The individual facts remain plausible but are assigned to the wrong people.",
+        "measured": false
+      }
+    },
+    {
+      "conversation_id": "conversation-v1-015",
+      "scenario_id": "recover-from-failure",
+      "title": "Stop repeating a failing support action",
+      "split": "calibration",
+      "variant": "well-handled",
+      "focus_dimension": "recovery_and_clarification",
+      "transcript_sha256": "54973787bc45ce86f030a11fe88a8d24bb9da55008363772c4acfdd946f44f66",
+      "turns": [
+        {
+          "id": "first",
+          "topic": "account-access",
+          "start": 1,
+          "end": 3
+        },
+        {
+          "id": "second",
+          "topic": "account-access",
+          "start": 3,
+          "end": 5
+        },
+        {
+          "id": "third",
+          "topic": "account-access",
+          "start": 5,
+          "end": 7
+        }
+      ],
+      "expected_outcomes": [
+        {
+          "id": "alternative-route",
+          "description": "After repeated delivery failure, give the specified alternative recovery route without claiming a reset.",
+          "evidenceTurns": [
+            "second",
+            "third"
+          ]
+        }
+      ],
+      "authored_expectation": {
+        "focus_score": {
+          "min": 4,
+          "max": 5
+        },
+        "violated_outcome": null,
+        "fault_turn": null,
+        "explanation": null,
+        "measured": false
+      }
+    },
+    {
+      "conversation_id": "conversation-v1-016",
+      "scenario_id": "recover-from-failure",
+      "title": "Stop repeating a failing support action",
+      "split": "calibration",
+      "variant": "faulty",
+      "focus_dimension": "recovery_and_clarification",
+      "transcript_sha256": "1cb1ce1a0202dcda5dc43cdeb7bbe178db44c36c15a73570d61aca127b3a70e3",
+      "turns": [
+        {
+          "id": "first",
+          "topic": "account-access",
+          "start": 1,
+          "end": 3
+        },
+        {
+          "id": "second",
+          "topic": "account-access",
+          "start": 3,
+          "end": 5
+        },
+        {
+          "id": "third",
+          "topic": "account-access",
+          "start": 5,
+          "end": 7
+        }
+      ],
+      "expected_outcomes": [
+        {
+          "id": "alternative-route",
+          "description": "After repeated delivery failure, give the specified alternative recovery route without claiming a reset.",
+          "evidenceTurns": [
+            "second",
+            "third"
+          ]
+        }
+      ],
+      "authored_expectation": {
+        "focus_score": {
+          "min": 1,
+          "max": 2
+        },
+        "violated_outcome": "alternative-route",
+        "fault_turn": "third",
+        "explanation": "Polite wording masks repetition of the already failing action.",
+        "measured": false
+      }
+    },
+    {
+      "conversation_id": "conversation-v1-017",
+      "scenario_id": "tool-grounded-billing",
+      "title": "Use bill evidence, not an invented charge",
+      "split": "calibration",
+      "variant": "well-handled",
+      "focus_dimension": "evidence_and_action_integrity",
+      "transcript_sha256": "ba5368cf47a50302f937a9ab1a1345e0a418a85ba6e7003ef5eb872b772698d7",
+      "turns": [
+        {
+          "id": "lookup",
+          "topic": "billing",
+          "start": 1,
+          "end": 5
+        },
+        {
+          "id": "switch",
+          "topic": "roaming",
+          "start": 5,
+          "end": 7
+        },
+        {
+          "id": "evidence",
+          "topic": "billing",
+          "start": 7,
+          "end": 9
+        }
+      ],
+      "expected_outcomes": [
+        {
+          "id": "read-evidence",
+          "description": "Use the returned account, total, and charge breakdown without inventing new charges.",
+          "evidenceTurns": [
+            "lookup",
+            "evidence"
+          ]
+        },
+        {
+          "id": "roaming",
+          "description": "Answer the intervening France question.",
+          "evidenceTurns": [
+            "switch"
+          ]
+        }
+      ],
+      "authored_expectation": {
+        "focus_score": {
+          "min": 4,
+          "max": 5
+        },
+        "violated_outcome": null,
+        "fault_turn": null,
+        "explanation": null,
+        "measured": false
+      }
+    },
+    {
+      "conversation_id": "conversation-v1-018",
+      "scenario_id": "tool-grounded-billing",
+      "title": "Use bill evidence, not an invented charge",
+      "split": "calibration",
+      "variant": "faulty",
+      "focus_dimension": "evidence_and_action_integrity",
+      "transcript_sha256": "317bcededcfb86303ff039169a24c3dd0763a45f97b468cf6a043d1be18704af",
+      "turns": [
+        {
+          "id": "lookup",
+          "topic": "billing",
+          "start": 1,
+          "end": 5
+        },
+        {
+          "id": "switch",
+          "topic": "roaming",
+          "start": 5,
+          "end": 7
+        },
+        {
+          "id": "evidence",
+          "topic": "billing",
+          "start": 7,
+          "end": 9
+        }
+      ],
+      "expected_outcomes": [
+        {
+          "id": "read-evidence",
+          "description": "Use the returned account, total, and charge breakdown without inventing new charges.",
+          "evidenceTurns": [
+            "lookup",
+            "evidence"
+          ]
+        },
+        {
+          "id": "roaming",
+          "description": "Answer the intervening France question.",
+          "evidenceTurns": [
+            "switch"
+          ]
+        }
+      ],
+      "authored_expectation": {
+        "focus_score": {
+          "min": 1,
+          "max": 2
+        },
+        "violated_outcome": "read-evidence",
+        "fault_turn": "evidence",
+        "explanation": "The total is plausible, but the charge type is not supported by the tool result.",
+        "measured": false
+      }
+    },
+    {
+      "conversation_id": "conversation-v1-019",
+      "scenario_id": "ambiguous-reference",
+      "title": "Clarify before acting on an ambiguous reference",
+      "split": "holdout",
+      "variant": "well-handled",
+      "focus_dimension": "recovery_and_clarification",
+      "transcript_sha256": "b0dabefead7a8652cef502e6a8341d66ee00b616e09c6b1acbd30d723d421a8b",
+      "turns": [
+        {
+          "id": "charges",
+          "topic": "billing",
+          "start": 1,
+          "end": 3
+        },
+        {
+          "id": "ambiguous",
+          "topic": "subscription",
+          "start": 3,
+          "end": 5
+        },
+        {
+          "id": "clarified",
+          "topic": "subscription",
+          "start": 5,
+          "end": 7
+        }
+      ],
+      "expected_outcomes": [
+        {
+          "id": "clarify",
+          "description": "Ask which of the two charges is meant before assuming a referent or claiming an action.",
+          "evidenceTurns": [
+            "ambiguous"
+          ]
+        },
+        {
+          "id": "instructions-only",
+          "description": "Give entertainment cancellation instructions without claiming a cancellation.",
+          "evidenceTurns": [
+            "clarified"
+          ]
+        }
+      ],
+      "authored_expectation": {
+        "focus_score": {
+          "min": 4,
+          "max": 5
+        },
+        "violated_outcome": null,
+        "fault_turn": null,
+        "explanation": null,
+        "measured": false
+      }
+    },
+    {
+      "conversation_id": "conversation-v1-020",
+      "scenario_id": "ambiguous-reference",
+      "title": "Clarify before acting on an ambiguous reference",
+      "split": "holdout",
+      "variant": "faulty",
+      "focus_dimension": "recovery_and_clarification",
+      "transcript_sha256": "83a3a06a0a2754da42538a030c500c0549ac29f4ff55d3a26a7b9f1b374a81e7",
+      "turns": [
+        {
+          "id": "charges",
+          "topic": "billing",
+          "start": 1,
+          "end": 3
+        },
+        {
+          "id": "ambiguous",
+          "topic": "subscription",
+          "start": 3,
+          "end": 5
+        },
+        {
+          "id": "clarified",
+          "topic": "subscription",
+          "start": 5,
+          "end": 7
+        }
+      ],
+      "expected_outcomes": [
+        {
+          "id": "clarify",
+          "description": "Ask which of the two charges is meant before assuming a referent or claiming an action.",
+          "evidenceTurns": [
+            "ambiguous"
+          ]
+        },
+        {
+          "id": "instructions-only",
+          "description": "Give entertainment cancellation instructions without claiming a cancellation.",
+          "evidenceTurns": [
+            "clarified"
+          ]
+        }
+      ],
+      "authored_expectation": {
+        "focus_score": {
+          "min": 1,
+          "max": 2
+        },
+        "violated_outcome": "clarify",
+        "fault_turn": "ambiguous",
+        "explanation": "The agent assumes an ambiguous referent and invents a successful account change; a later correct answer does not erase this.",
+        "measured": false
+      }
+    },
+    {
+      "conversation_id": "conversation-v1-021",
+      "scenario_id": "wrong-tool-account",
+      "title": "Use the requested account in a tool call",
+      "split": "holdout",
+      "variant": "well-handled",
+      "focus_dimension": "context_separation",
+      "transcript_sha256": "342925ff558c3c2cfacd40837b3bfa301125ef84227f7e11d4ae107e3a87b188",
+      "turns": [
+        {
+          "id": "roaming",
+          "topic": "roaming",
+          "start": 1,
+          "end": 3
+        },
+        {
+          "id": "requested-account",
+          "topic": "billing",
+          "start": 3,
+          "end": 7
+        }
+      ],
+      "expected_outcomes": [
+        {
+          "id": "requested-identity",
+          "description": "Call get_bill with DEMO-002 and report the bill for that requested account.",
+          "evidenceTurns": [
+            "requested-account"
+          ]
+        }
+      ],
+      "authored_expectation": {
+        "focus_score": {
+          "min": 4,
+          "max": 5
+        },
+        "violated_outcome": null,
+        "fault_turn": null,
+        "explanation": null,
+        "measured": false
+      }
+    },
+    {
+      "conversation_id": "conversation-v1-022",
+      "scenario_id": "wrong-tool-account",
+      "title": "Use the requested account in a tool call",
+      "split": "holdout",
+      "variant": "faulty",
+      "focus_dimension": "context_separation",
+      "transcript_sha256": "c188cad3e88ad67e40dae0117d52c9ea3ad2eedfe553476a884bbf5b71916c47",
+      "turns": [
+        {
+          "id": "roaming",
+          "topic": "roaming",
+          "start": 1,
+          "end": 3
+        },
+        {
+          "id": "requested-account",
+          "topic": "billing",
+          "start": 3,
+          "end": 7
+        }
+      ],
+      "expected_outcomes": [
+        {
+          "id": "requested-identity",
+          "description": "Call get_bill with DEMO-002 and report the bill for that requested account.",
+          "evidenceTurns": [
+            "requested-account"
+          ]
+        }
+      ],
+      "authored_expectation": {
+        "focus_score": {
+          "min": 1,
+          "max": 2
+        },
+        "violated_outcome": "requested-identity",
+        "fault_turn": "requested-account",
+        "explanation": "The tool succeeds and the answer matches its output, but the agent queried the wrong account.",
+        "measured": false
+      }
+    },
+    {
+      "conversation_id": "conversation-v1-023",
+      "scenario_id": "corrected-duration-total",
+      "title": "Recompute after a correction and topic switch",
+      "split": "holdout",
+      "variant": "well-handled",
+      "focus_dimension": "correction_handling",
+      "transcript_sha256": "187d39b5cf9a10bec7ac7ffea1b80156ffbb1fa79b7c5bc0cc962490030f8228",
+      "turns": [
+        {
+          "id": "initial-trip",
+          "topic": "travel",
+          "start": 1,
+          "end": 3
+        },
+        {
+          "id": "correction",
+          "topic": "travel",
+          "start": 3,
+          "end": 5
+        },
+        {
+          "id": "plan",
+          "topic": "billing",
+          "start": 5,
+          "end": 7
+        },
+        {
+          "id": "combined-total",
+          "topic": "billing",
+          "start": 7,
+          "end": 9
+        }
+      ],
+      "expected_outcomes": [
+        {
+          "id": "corrected-total",
+          "description": "Use three days, not two, to compute GBP 18 roaming and GBP 42 combined total.",
+          "evidenceTurns": [
+            "correction",
+            "combined-total"
+          ]
+        }
+      ],
+      "authored_expectation": {
+        "focus_score": {
+          "min": 4,
+          "max": 5
+        },
+        "violated_outcome": null,
+        "fault_turn": null,
+        "explanation": null,
+        "measured": false
+      }
+    },
+    {
+      "conversation_id": "conversation-v1-024",
+      "scenario_id": "corrected-duration-total",
+      "title": "Recompute after a correction and topic switch",
+      "split": "holdout",
+      "variant": "faulty",
+      "focus_dimension": "correction_handling",
+      "transcript_sha256": "60ff817b85cd76e4700973c03455b8d693efd32fc16ad75ead3cf0270f4ac30d",
+      "turns": [
+        {
+          "id": "initial-trip",
+          "topic": "travel",
+          "start": 1,
+          "end": 3
+        },
+        {
+          "id": "correction",
+          "topic": "travel",
+          "start": 3,
+          "end": 5
+        },
+        {
+          "id": "plan",
+          "topic": "billing",
+          "start": 5,
+          "end": 7
+        },
+        {
+          "id": "combined-total",
+          "topic": "billing",
+          "start": 7,
+          "end": 9
+        }
+      ],
+      "expected_outcomes": [
+        {
+          "id": "corrected-total",
+          "description": "Use three days, not two, to compute GBP 18 roaming and GBP 42 combined total.",
+          "evidenceTurns": [
+            "correction",
+            "combined-total"
+          ]
+        }
+      ],
+      "authored_expectation": {
+        "focus_score": {
+          "min": 1,
+          "max": 2
+        },
+        "violated_outcome": "corrected-total",
+        "fault_turn": "combined-total",
+        "explanation": "The agent falls back to the obsolete duration when combining information across topics.",
+        "measured": false
+      }
+    }
+  ]
+}

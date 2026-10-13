@@ -1,0 +1,55 @@
+{
+  "name": "multi-topic-conversation-quality",
+  "version": "1",
+  "status": "authored-not-cloud-calibrated",
+  "evaluation_level": "conversation",
+  "definition": {
+    "type": "rubric",
+    "pass_threshold": 0.8,
+    "dimensions": [
+      {
+        "id": "topic_switching",
+        "description": "Follow explicit user-led topic changes and return to earlier topics when requested. Do not penalise multiple unrelated topics, a resolved request followed by a new one, or an explicit abandonment. Score 5 for correct transitions, 3 for material confusion recovered later, and 1 for pursuing the wrong topic without recovery. Skip if no topic transition occurs.",
+        "weight": 5
+      },
+      {
+        "id": "request_coverage",
+        "description": "Address each active request to its appropriate endpoint using the conversation's instructions and evidence. Distinguish pending, completed, deferred, withdrawn, and clarification-needed requests. Asking a necessary clarifying question is not itself a failure; an explicitly withdrawn request is not unfinished work. Score 5 when all applicable requests are handled appropriately, 3 for a material gap, and 1 for dropping a request or falsely claiming completion.",
+        "weight": 9,
+        "always_applicable": true
+      },
+      {
+        "id": "context_retention",
+        "description": "Recover relevant previously supplied information when later requests refer to it, without asking again unnecessarily or substituting newer unrelated facts. Score 5 for accurate recall, 3 for incomplete recall without material misinformation, and 1 for forgetting or replacing information needed to answer. Skip if no earlier information needs to be recovered.",
+        "weight": 6
+      },
+      {
+        "id": "correction_handling",
+        "description": "Use the latest explicit user correction in subsequent answers and calculations, while retaining other unchanged values. Score 5 for consistent use of the correction, 3 for a slip explicitly corrected before affecting the outcome, and 1 for a materially wrong answer based on a superseded value. Skip if there is no explicit correction.",
+        "weight": 6
+      },
+      {
+        "id": "context_separation",
+        "description": "Keep different people, accounts, trips, historical charges, future rates, and topics correctly associated. Tool calls must use the identity requested by the user. Score 5 for correct associations, 3 for ambiguity that is clarified without a wrong action, and 1 for materially applying one entity's or topic's facts to another. Skip when no distinct entities or contexts need separation.",
+        "weight": 6
+      },
+      {
+        "id": "evidence_and_action_integrity",
+        "description": "Support factual claims with the scenario instructions, user facts, and available tool results. A tool's technical success does not prove the correct task was done. Do not invent charges, fabricate an action, or claim success for an action the tools did not perform. Score 5 for supported claims, 3 for a material imprecision, and 1 for a contradiction, fabricated action, or unsupported success claim. Judge earlier false claims even if the final answer is correct.",
+        "weight": 6
+      },
+      {
+        "id": "recovery_and_clarification",
+        "description": "After repeated failure, choose an available alternative rather than repeat the same ineffective action. Clarify an ambiguous reference before assuming an identity or acting. Score 5 for appropriate recovery or clarification, 3 for an unnecessary repetition followed by recovery, and 1 for continued ineffective repetition or an unjustified consequential assumption. Skip if no failure or material ambiguity occurs.",
+        "weight": 5
+      }
+    ]
+  },
+  "calibration_policy": {
+    "expected_well_handled_focus_min": 4,
+    "expected_faulty_focus_max": 2,
+    "critical_failures": "Inspect dimension-level failures; an aggregate pass never overrides a failed scenario requirement.",
+    "holdout_policy": "Do not use holdout scores to tune the rubric. A changed rubric after holdout inspection requires a new held-out set.",
+    "limitations": "Expectations are authored hypotheses, not measured Foundry scores. Built-in task completion can differ from rubric judgments for clarification or withdrawn requests."
+  }
+}

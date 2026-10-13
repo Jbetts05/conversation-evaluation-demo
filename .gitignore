@@ -1,0 +1,9 @@
+.venv/
+node_modules/
+.local.env
+.local/
+api/local.settings.json
+.foundry/results/
+test-results/
+playwright-report/
+infra/main.json

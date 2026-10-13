@@ -1,0 +1,16 @@
+{
+  "name": "conversation-lab-api",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "functions.mjs",
+  "engines": {
+    "node": ">=22"
+  },
+  "dependencies": {
+    "@azure/ai-projects": "2.8.0",
+    "@azure/functions": "4.16.5",
+    "@azure/identity": "4.13.3",
+    "conversation-evaluation-demo": "file:.."
+  }
+}
