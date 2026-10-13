@@ -1,6 +1,6 @@
 # Conversation Lab deployment plan
 
-Status: Deployed - Astra judge and seven-evaluator profile
+Status: Validated - UI asset/configuration refresh update
 
 ## Approved scope
 
@@ -192,6 +192,24 @@ Hosted real UI and tool-evidence checks passed: the downloadable report confirms
 Astra in both declared provenance and returned model usage, all eight primary
 conversation metrics are present, no-tool results are explicitly not applicable,
 and real tool traces complete the tool-use composite successfully.
+
+## UI freshness correction
+
+The user reported Mini in the judge panel and an output_quality gate displayed
+as 1/5. Live Azure settings and API configuration both confirmed Astra, and a
+fresh deployed renderer correctly used 1/1. The reported repeated raw composite
+labels matched the older in-memory renderer.
+
+The UI now uses content-addressed application, module and style assets. HTML
+revalidates on navigation, and configuration/recorded-result requests bypass
+caches. The judge panel refreshes on opening, tab return, and before a new run.
+Historical model attribution is preserved and explicitly distinguished from the
+current judge. Binary composite gates include an explicit 0/1 explanation.
+
+Update validation: 30 Node tests passed; the real-browser stale-configuration
+regression refreshed a simulated Mini catalog to the actual Astra configuration,
+showed output_quality as 1/1 with distinct component labels, and loaded versioned
+assets. No model, identity, inference configuration, or infrastructure changes.
 
 ## Files and data lifecycle
 

@@ -8,3 +8,5 @@ test-results/
 playwright-report/
 infra/main.json
 .impeccable/hook.cache.json
+web/index.html
+web/assets/

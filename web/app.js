@@ -1,4 +1,4 @@
-import { metricTitle, scoreText, resultState, groupMetrics } from "./metrics.js";
+import { metricTitle, metricKey, scoreText, resultState, groupMetrics } from "./metrics.js";
 
 (() => {
   "use strict";
@@ -12,6 +12,7 @@ import { metricTitle, scoreText, resultState, groupMetrics } from "./metrics.js"
   let busy = false;
   let chatting = false;
   let chatHistory;
+  let configurationRequest;
 
   function element(tag, className, text) {
     const node = document.createElement(tag);
@@ -24,8 +25,11 @@ import { metricTitle, scoreText, resultState, groupMetrics } from "./metrics.js"
     $("status").classList.toggle("error", error);
   }
   async function api(path, body) {
-    const response = await fetch(`/api${path}`, body === undefined ? {} : {
-      method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body),
+    const response = await fetch(`/api${path}`, {
+      cache: "no-store",
+      ...(body === undefined ? {} : {
+        method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body),
+      }),
     });
     let data;
     try { data = await response.json(); }
@@ -44,6 +48,22 @@ import { metricTitle, scoreText, resultState, groupMetrics } from "./metrics.js"
   }
   function cleanItem(item) {
     return { messages: structuredClone(item.messages), tool_definitions: structuredClone(item.tool_definitions ?? []) };
+  }
+  function renderConfiguration() {
+    const config = corpus.configuration;
+    $("configuration").textContent = `Judge: ${config.judge ?? "not configured"} · Chat: ${config.chat ?? "not configured"} · Rubric version: ${config.rubricVersion ?? "not registered"}`;
+    $("judge-summary").textContent = `Evaluation judge: ${config.judge ?? "not configured"}`;
+  }
+  async function refreshConfiguration() {
+    if (configurationRequest) return configurationRequest;
+    configurationRequest = (async () => {
+      corpus.configuration = await api("/configuration");
+      renderConfiguration();
+      renderJobs();
+      controls();
+    })();
+    try { await configurationRequest; }
+    finally { configurationRequest = null; }
   }
   function inputItem() {
     return mode === "chat" ? { messages: structuredClone(chatHistory), tool_definitions: [] } : cleanItem(current);
@@ -135,6 +155,9 @@ import { metricTitle, scoreText, resultState, groupMetrics } from "./metrics.js"
     const state = resultState(result);
     heading.append(element("span", `score ${state}`, scoreText(result)));
     node.append(heading);
+    if (["output_quality", "tool_use_quality"].includes(metricKey(result)) && state !== "skipped") {
+      node.append(element("p", "muted", "Binary gate: 1 = pass, 0 = fail. This is not a 1–5 rating."));
+    }
     if (result.reason) {
       const why = element("details");
       why.append(element("summary", "", "Why this score"));
@@ -168,7 +191,10 @@ import { metricTitle, scoreText, resultState, groupMetrics } from "./metrics.js"
       card.append(element("h3", "", job.title));
       card.append(element("p", `result-status${job.error ? " error" : ""}`, job.error ?? (job.source === "recorded-foundry-run" ? `Recorded · ${job.result.provenance.recorded_at}` : job.status ?? "Preparing")));
       const judge = job.result?.provenance?.judge ?? job.definition?.testing_criteria?.[0]?.initialization_parameters?.deployment_name;
-      if (judge) card.append(element("p", "muted", `Judge: ${judge}`));
+      if (judge) {
+        const historical = corpus.configuration.judge && judge !== corpus.configuration.judge;
+        card.append(element("p", "muted", `Judge: ${judge}${historical ? ` · previous judge; current judge is ${corpus.configuration.judge}` : ""}`));
+      }
       if (job.result?.status === "completed" && (job.result.result_counts?.errored || job.result.item_errors)) {
         card.append(element("p", "error", "Some evaluator items errored. This is not a successful quality assessment."));
       }
@@ -251,6 +277,9 @@ import { metricTitle, scoreText, resultState, groupMetrics } from "./metrics.js"
   async function evaluate(compare) {
     if (busy) return;
     busy = true;
+    controls();
+    await refreshConfiguration();
+    if (!corpus.configuration.liveEnabled) throw new Error("New live evaluations are currently disabled.");
     const snapshots = compare
       ? corpus.catalog.filter((entry) => entry.scenario_id === currentMeta.scenario_id).map((entry) => ({
         snapshot: cleanItem(corpus.rows.find((row) => row.id === entry.conversation_id)),
@@ -282,7 +311,8 @@ import { metricTitle, scoreText, resultState, groupMetrics } from "./metrics.js"
   $("recorded").addEventListener("click", async () => {
     if (busy) { status("Wait for the current runs to finish before loading a recorded example.", true); return; }
     try {
-      const response = await fetch("/reference-runs.json");
+      await refreshConfiguration();
+      const response = await fetch("/reference-runs.json", { cache: "no-store" });
       if (!response.ok) throw new Error("Recorded runs are not available in this deployment.");
       const recorded = await response.json();
       jobs = recorded.runs;
@@ -339,10 +369,16 @@ import { metricTitle, scoreText, resultState, groupMetrics } from "./metrics.js"
     chatting = false; renderConversation(); controls();
     $("messages").scrollTop = $("messages").scrollHeight;
   });
+  $("judge-details").addEventListener("toggle", () => {
+    if (corpus && $("judge-details").open) void refreshConfiguration().catch((error) => status(`Unable to refresh judge configuration: ${error.message}`, true));
+  });
+  document.addEventListener("visibilitychange", () => {
+    if (corpus && !document.hidden) void refreshConfiguration().catch((error) => status(`Unable to refresh configuration: ${error.message}`, true));
+  });
   async function initialize() {
     corpus = await api("/catalog");
     populateScenarios(); chooseExample();
-    $("configuration").textContent = `Judge: ${corpus.configuration.judge ?? "not configured"} · Chat: ${corpus.configuration.chat ?? "not configured"} · Rubric version: ${corpus.configuration.rubricVersion ?? "not registered"}`;
+    renderConfiguration();
     $("configuration").after(element("p", "muted", "Each turn is scored with only its preceding context. Short social closings can receive low relevance scores despite being appropriate; inspect the explanation."));
     for (const dimension of corpus.rubric.definition.dimensions) {
       const details = element("details", "inspector");

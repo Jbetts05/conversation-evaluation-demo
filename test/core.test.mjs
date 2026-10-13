@@ -124,3 +124,14 @@ test("anonymous catalog works without credentials, but missing signing key preve
   assert.equal(prepare.status, 503);
   assert.equal(invoked, false);
 });
+
+test("lightweight configuration refresh reads current settings without exposing server secrets", async () => {
+  const config = { judge: "receipt-gpt-54-mini", chat: "gpt-6-luna", clientSecret: "private-value", signingKey: "k".repeat(48) };
+  const dispatch = application({ corpus, config, log: () => {} });
+  const before = await dispatch({ method: "GET", path: "/configuration" });
+  assert.equal(before.body.judge, "receipt-gpt-54-mini");
+  config.judge = "gpt-6-astra";
+  const after = await dispatch({ method: "GET", path: "/configuration" });
+  assert.equal(after.body.judge, "gpt-6-astra");
+  assert.ok(!Object.hasOwn(after.body, "clientSecret") && !Object.hasOwn(after.body, "signingKey"));
+});

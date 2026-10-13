@@ -11,25 +11,27 @@ export async function loadCorpus() {
 export function application({ corpus, config, providerFactory = () => createFoundry(config), log = console.error }) {
   const limit = makeLimiter();
   let provider;
+  const publicConfiguration = () => ({
+    liveEnabled: config.liveEnabled,
+    judge: config.judge ?? null,
+    chat: config.chat ?? null,
+    rubricName: config.rubricName ?? null,
+    rubricVersion: config.rubricVersion ?? null,
+    visitorAuthentication: false,
+  });
   const cloud = () => provider ??= providerFactory();
   const handles = () => createHandles(config.signingKey);
   const live = () => {
     if (!config.liveEnabled) throw new HttpError(503, "Live calls are disabled. You can still inspect and export the prepared conversations.");
   };
   async function dispatch(method, path, body, signal) {
+    if (method === "GET" && path === "/configuration") return publicConfiguration();
     if (method === "GET" && path === "/catalog") {
       return {
         rows: corpus.rows,
         catalog: corpus.catalog,
         rubric: corpus.rubric,
-        configuration: {
-          liveEnabled: config.liveEnabled,
-          judge: config.judge ?? null,
-          chat: config.chat ?? null,
-          rubricName: config.rubricName ?? null,
-          rubricVersion: config.rubricVersion ?? null,
-          visitorAuthentication: false,
-        },
+        configuration: publicConfiguration(),
       };
     }
     if (method !== "POST") throw new HttpError(404, "API route not found.");

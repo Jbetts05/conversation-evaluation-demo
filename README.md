@@ -73,6 +73,13 @@ model ranking, or cost estimate is shown. Thresholds are visible, and individual
 dimension failures remain available even if a weighted average looks acceptable.
 Skipped/missing/errored evaluators are not treated as quality passes.
 
+Output-quality and tool-use-quality gates are binary: `1/1` passes at threshold
+1, while their individual Likert components use scales such as `4/5`.
+Content-addressed UI assets prevent old formatters being mixed with new API
+results. Judge settings refresh before evaluation, on opening the judge details,
+and when returning to the tab. Historical results retain their actual judge and
+are labelled when that differs from the current configuration.
+
 Foundry jobs run asynchronously. The API prepares and submits a run in separate
 short calls; the browser polls status. A page refresh resumes known runs without
 resubmitting them. Ambiguous submission failures are not automatically retried:
@@ -130,6 +137,10 @@ node scripts\build-web.mjs
 node --test
 node scripts\server.mjs
 ```
+
+Edit `web/index.template.html`, not the generated `web/index.html`. The web
+preparation command writes content-versioned assets and the Static Web Apps cache
+and security headers; there is still no frontend framework or bundler.
 
 `scripts\calibrate.mjs` performs billable cloud smoke evaluations and persists
 reports under ignored `.foundry\results\`. It registers a content-addressed rubric

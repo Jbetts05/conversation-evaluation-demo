@@ -119,6 +119,7 @@
         </div>
         <aside class="guide-panel panel">
           <span class="eyebrow">Two perspectives</span>
+          <p id="judge-summary" class="muted" aria-live="polite"></p>
           <h2>The reply.<br>The journey.</h2>
           <p>Did each answer address the question? Did the conversation accomplish what the user actually needed?</p>
           <div class="perspective"><span class="step">01</span><div><h3>Turn by turn</h3><p>Relevance and intent resolution.</p></div></div>
@@ -130,7 +131,7 @@
           </div>
           <p id="status" class="status" role="status" aria-live="polite">Loading...</p>
           <p class="privacy">Evaluation sends this transcript to Foundry and retains the run there. Evaluated snapshots stay in this browser tab for resume/export. Use fictional or non-sensitive data.</p>
-          <details class="inspector">
+          <details id="judge-details" class="inspector">
             <summary>Judge · rubric · configuration</summary>
             <p id="configuration" class="muted"></p>
             <p class="muted">Rubric evaluation is preview and model-judged. Scores are not ground truth or a customer benchmark.</p>
