@@ -1,88 +1,119 @@
-# Evaluate the answer. Then evaluate the journey.
+# Evaluate multi-turn conversations in Microsoft Foundry
 
-**Turn-level evaluation asks: "Was this reply good?"  
-Conversation-level evaluation asks: "Did this interaction work?"**
+Assess whether an assistant fulfilled the user's requests across an interaction.
+Use turn-level evaluation alongside it to identify replies that need work.
 
-For a multi-turn assistant, usually use both. One diagnoses individual steps;
-the other checks outcomes that a last-answer check or average score can hide.
+## Why evaluate the whole conversation?
 
-## When to use which
+Consider a support conversation:
 
-| Use | When | Why |
-|-----|------|-----|
-| **Turn level** | Testing answer relevance, grounded claims, or a particular tool interaction | Find the response or step that needs fixing |
-| **Conversation level** | Testing topic switches, corrections, interruptions, remembered context, or task completion | Judge the user's complete experience |
-| **Both** | Comparing versions of a multi-turn assistant | Distinguish a local response defect from an end-to-end failure |
+| User request | Assistant response |
+|--------------|--------------------|
+| "Help me dispute this charge." | Asks for the charge date |
+| "Before that, is France roaming included?" | Answers the roaming question |
+| "The charge was on 12 June. How do I enable roaming?" | Gives roaming instructions, but forgets the dispute |
 
-**Example:** a user asks for billing-dispute instructions, briefly asks about
-roaming, then supplies the missing billing information. The agent answers roaming
-but never finishes the dispute guidance. Some replies are useful; the earlier
-request is still unresolved. A full per-turn check may catch a bad step, while
-conversation evaluation makes the unfinished obligation explicit.
+Useful replies can coexist with an unfinished request. Conversation evaluation
+checks the outcome; turn checks help locate the missed step.
 
-## A practical approach
+## 1. Choose an evaluation level
 
-1. **Define success first.** Write the requests, constraints and expected outcomes.
-   Distinguish pending work from work the user explicitly withdrew. Necessary
-   clarification and legitimate topic changes are not failures.
+| Level | What is assessed | Use it for |
+|-------|------------------|------------|
+| **Turn** | One reply, with the context available at that point | Relevance, answer quality and individual tool interactions |
+| **Conversation** | The complete interaction | Task completion, satisfaction, topic changes and continuity |
 
-2. **Capture enough evidence.** Use one complete conversation per JSONL line,
-   with ordered `messages`. Keep relevant instructions, facts, tool calls,
-   results and `tool_definitions`. Review data-handling and retention requirements
-   before cloud upload.
-   Pair well-handled and faulty examples; reserve separate scenarios from tuning.
+Set `evaluation_level` explicitly; the default is `"turn"`. A whole `messages`
+record may yield only a final-reply score in turn mode. To assess every reply,
+submit prefixes as in step 4. Check `supported_evaluation_levels`: unsupported
+evaluators can be skipped without failing the run.
 
-3. **Choose the questions you need answered.** Use a business-specific rubric for
-   outcomes such as context retention or correct resumption. Add built-ins for
-   completion, satisfaction, coherence and groundedness, with the source facts or
-   tool results needed to verify claims. `output_quality` bundles
-   several quality dimensions; `tool_use_quality` bundles tool checks. Add
-   deflection and safety measures where relevant. Check each evaluator's
-   `supported_evaluation_levels` and judge-model compatibility.
+## 2. Prepare conversation data
 
-4. **Set the level explicitly.** Map `messages` and set the run's
-   `evaluation_level` to `"turn"` or `"conversation"`; the default is `"turn"`.
-   Don't assume a whole `messages` item produces one score per reply: in our runs
-   it could score only the final reply. This repo submits one prefix ending at each
-   completed assistant text reply. Tool calls/results stay in context, not separate
-   reply rows; future messages are excluded. See [`evaluationRun()`](../api/lib/core.mjs).
-   Check that the score count matches the intended reply count.
+Use one complete conversation per JSONL line. This record is formatted for
+readability; serialize it onto one line:
 
-5. **Read evidence, not just the headline.** Inspect scores, thresholds, reasons,
-   component results and execution status. Unsupported evaluators can be skipped
-   without failing the run. Missing/error results are not passes; no-tool
-   applicability is different from an unexpected skip. The
-   [result inspector](../api/lib/evaluation-results.mjs) makes that distinction.
+```json
+{
+  "messages": [
+    {"role": "system", "content": "Fictional facts: monthly plan GBP 24; France roaming included."},
+    {"role": "user", "content": "What is my monthly plan charge?"},
+    {"role": "assistant", "content": "GBP 24."},
+    {"role": "user", "content": "New question: is France roaming included?"},
+    {"role": "assistant", "content": "Yes, France roaming is included."}
+  ]
+}
+```
 
-## Keep the conclusions honest
+Include supporting facts and, where used, tool calls, results and `tool_definitions`.
+Don't penalise legitimate topic changes or withdrawn requests. Review privacy
+and retention requirements before uploading.
 
-Choose the judge deliberately. The [composite reference](https://learn.microsoft.com/azure/foundry/concepts/evaluation-evaluators/agent-evaluators#composite-evaluators-preview)
-recommends GPT-5.6-family judges; this deployment verified both composites with
-**GPT-6 Astra**, judging **GPT-6 Luna**. Test compatibility in your project and
-calibrate against human-reviewed examples; strength is not a guarantee of truth.
-Keep judge, rubric, dataset and thresholds
-fixed when comparing versions; repeat selected cases to observe variability.
+## 3. Select compatible evaluators
 
-Composite gates are **binary**: 1 means pass, 0 means fail. Components use their
-own scales, including `1–5` and `0–1`. If all components are skipped, the gate is
-`not_applicable`, not a pass. Overlapping composite and standalone dimensions are
-not independent votes; this demo shows both for teaching.
+| Evaluator | What it helps assess |
+|-----------|----------------------|
+| `output_quality` | Multiple quality dimensions in one composite assessment |
+| `tool_use_quality` | Tool selection, inputs, execution and use of results |
+| `deflection_rate` | Whether the assistant deflected requests |
+| `customer_satisfaction` | Helpfulness and the overall user experience |
+| `task_completion` | Whether the requested work was completed |
+| `coherence` | Consistency and flow across the interaction |
+| `groundedness` | Whether claims are supported by supplied evidence |
 
-Several evaluators here are **preview**: no SLA and not recommended by Microsoft
-for production workloads. Check current feature status before operational use.
+All seven support conversation level. Add a rubric for domain-specific criteria,
+such as retaining corrections. Composite and individual scores overlap; don't
+count them as independent votes.
 
-An evaluation detects behaviour; it does not implement intent orchestration or
-memory. Pair model judgments with deterministic checks where state or tool
-arguments have exact expected values. Our
-[scenarios](../data/scenarios.mjs) and [rubric](../data/rubric.json) show the pattern.
-The small fictional dataset demonstrates techniques, not production accuracy.
+## 4. Create and run an evaluation
 
-## Follow the sources
+Complete the [client setup](https://learn.microsoft.com/azure/foundry/observability/how-to/cloud-evaluation#set-up-the-sdk-client)
+with a deployed judge. This JavaScript fragment uses its `openAIClient`, your
+`judgeDeployment`, and the record above as `conversation`:
 
-**Foundry docs:** [conversation workflow](https://learn.microsoft.com/azure/foundry/observability/how-to/cloud-evaluation-conversations?tabs=python)
-· [levels and compatibility](https://learn.microsoft.com/azure/foundry/concepts/built-in-evaluators#evaluation-levels)
-· [rubrics](https://learn.microsoft.com/azure/foundry/concepts/evaluation-evaluators/rubric-evaluators).
+```javascript
+const evaluation = await openAIClient.evals.create({
+  name: "Support conversation",
+  data_source_config: {
+    type: "custom",
+    item_schema: {
+      type: "object", properties: { messages: { type: "array" } },
+      required: ["messages"]
+    },
+    include_sample_schema: false
+  },
+  testing_criteria: [{
+    type: "azure_ai_evaluator", name: "task_completion",
+    evaluator_name: "builtin.task_completion",
+    initialization_parameters: { deployment_name: judgeDeployment },
+    data_mapping: { messages: "{{item.messages}}" }
+  }]
+});
+const run = await openAIClient.evals.runs.create(evaluation.id, {
+  data_source: {
+    type: "jsonl",
+    source: { type: "file_content", content: [{ item: conversation }] }
+  },
+  evaluation_level: "conversation"
+});
+```
 
-**Microsoft code:** [Python conversation sample](https://github.com/Azure/azure-sdk-for-python/blob/main/sdk/ai/azure-ai-projects/samples/evaluations/sample_multiturn_conversation_evaluation.py)
-· [JavaScript conversation sample](https://github.com/Azure/azure-sdk-for-js/blob/main/sdk/ai/ai-projects/samples-dev/evaluations/multiturnConversationEvaluation.ts)
-· [JavaScript rubric sample](https://github.com/Azure/azure-sdk-for-js/blob/main/sdk/ai/ai-projects/samples-dev/evaluations/evaluatorsCatalogRubric.ts).
+Poll the run and retrieve output items. For turn scores, submit a prefix ending
+at each completed reply, retaining earlier tool evidence but excluding future messages.
+
+## 5. Read the results
+
+Inspect the **score, threshold, verdict, reason and execution status**. A composite
+gate uses `0/1`; components have their own scales. A no-tools `not_applicable`
+result is not a pass, and unexpected skips/errors need investigation.
+
+Calibrate a compatible judge against human-reviewed examples. This demo uses
+GPT-6 Astra to judge GPT-6 Luna. Several evaluators are preview; review current
+restrictions before operational use. Evaluation detects behaviour; it does not
+implement memory or orchestration.
+
+**Continue:** [Foundry conversation how-to](https://learn.microsoft.com/azure/foundry/observability/how-to/cloud-evaluation-conversations)
+· [Python sample](https://github.com/Azure/azure-sdk-for-python/blob/main/sdk/ai/azure-ai-projects/samples/evaluations/sample_multiturn_conversation_evaluation.py)
+· [JavaScript sample](https://github.com/Azure/azure-sdk-for-js/blob/main/sdk/ai/ai-projects/samples-dev/evaluations/multiturnConversationEvaluation.ts)
+· [this repo's implementation](../api/lib/core.mjs)
+· [rubric criteria](../data/rubric.json).

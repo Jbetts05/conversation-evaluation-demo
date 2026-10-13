@@ -21,8 +21,8 @@ The animation uses recorded scores from a fictional Astra example. Its timing is
 illustrative, not an inference-latency claim. The source is self-hostable; a live
 deployment requires your own Foundry project, model deployments and credentials.
 
-**Start here:** [Turn or conversation evaluation? A practical human guide](docs/evaluation-guide.md)
-— when to use each, why it matters, and how to do it correctly.
+**Start here:** [Evaluate multi-turn conversations in Microsoft Foundry](docs/evaluation-guide.md)
+— a short how-to with an example, compatible evaluators, an SDK run and result interpretation.
 
 ## Use the demo
 
