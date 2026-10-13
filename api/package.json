@@ -10,7 +10,6 @@
   "dependencies": {
     "@azure/ai-projects": "2.8.0",
     "@azure/functions": "4.16.5",
-    "@azure/identity": "4.13.3",
-    "conversation-evaluation-demo": "file:.."
+    "@azure/identity": "4.13.3"
   }
 }

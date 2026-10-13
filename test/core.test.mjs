@@ -1,10 +1,19 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import { readFile } from "node:fs/promises";
 import { snapshot, transcriptHash, createHandles, criteria, evaluationRun, makeLimiter } from "../api/lib/core.mjs";
 import { application, loadCorpus } from "../api/lib/application.mjs";
 
 const corpus = await loadCorpus();
 const row = corpus.rows[0];
+
+test("deployment dependencies have no parent-package links or recursive symlinks", async () => {
+  const manifest = JSON.parse(await readFile(new URL("../api/package.json", import.meta.url), "utf8"));
+  const lock = JSON.parse(await readFile(new URL("../api/package-lock.json", import.meta.url), "utf8"));
+  assert.ok(Object.values(manifest.dependencies).every((version) => !/^(file:|link:)/.test(version)));
+  assert.deepEqual(lock.packages[""].dependencies, manifest.dependencies);
+  assert.ok(Object.values(lock.packages).every((entry) => !entry.link));
+});
 
 test("sanitizes inputs, rejects incomplete dialogues and preserves hashes", () => {
   const input = { ...row, authored_expectation: "do not send this" };
