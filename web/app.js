@@ -298,7 +298,10 @@
     } catch (error) { status(error.message, true); }
   });
   $("export-transcript").addEventListener("click", () => download("conversation.jsonl", JSON.stringify(inputItem()) + "\n", "application/x-ndjson"));
-  $("export-report").addEventListener("click", () => download("conversation-evaluation-report.json", JSON.stringify({ application: "Conversation Lab", exported_at: new Date().toISOString(), rubric: corpus.rubric, runs: jobs }, null, 2), "application/json"));
+  $("export-report").addEventListener("click", () => {
+    const reports = jobs.map(({ handle, prepared, ...report }) => report);
+    download("conversation-evaluation-report.json", JSON.stringify({ application: "Conversation Lab", exported_at: new Date().toISOString(), rubric: corpus.rubric, runs: reports }, null, 2), "application/json");
+  });
   $("apply-edit").addEventListener("click", () => {
     try {
       const edited = JSON.parse($("json-editor").value);

@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { createRequire } from "node:module";
-import { mkdir } from "node:fs/promises";
+import { mkdir, readFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 
 const require = createRequire(import.meta.url);
@@ -34,6 +34,8 @@ try {
   await page.locator("#export-report").click();
   const download = await downloadPromise;
   assert.equal(download.suggestedFilename(), "conversation-evaluation-report.json");
+  const report = JSON.parse(await readFile(await download.path(), "utf8"));
+  assert.ok(report.runs.every((run) => !Object.hasOwn(run, "handle") && !Object.hasOwn(run, "prepared")));
   await page.reload();
   await page.locator("#results .metric").first().waitFor();
   assert.equal(await page.locator("#results .result-card").count(), 2);

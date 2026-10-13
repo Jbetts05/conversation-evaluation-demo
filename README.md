@@ -17,6 +17,9 @@ containers, application database, or visitor sign-in.
 5. Export a transcript or download the report containing the exact evaluated
    snapshot, settings, run IDs, and results.
 
+Downloaded reports omit signed status/cancellation capabilities; sharing a report
+does not grant control of the evaluation run.
+
 **View a recorded Foundry run** shows explicitly labelled, genuine past results.
 It does not initiate a new evaluation and never presents recorded scores as live.
 

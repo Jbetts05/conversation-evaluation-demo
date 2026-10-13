@@ -38,4 +38,4 @@ for (const [path, content] of outputs) {
 const counts = Object.fromEntries(["calibration", "holdout"].map((split) => [
   split, catalog.filter((entry) => entry.split === split).length,
 ]));
-console.log(`${checkOnly ? "Checked" : "Built"} ${scenarios.length} paired scenarios, ${rows.length} conversations: ${JSON.stringify(counts)}. No cloud scoring has been run.`);
+console.log(`${checkOnly ? "Checked" : "Built"} ${scenarios.length} paired scenarios, ${rows.length} conversations: ${JSON.stringify(counts)}. This command makes no cloud calls.`);
