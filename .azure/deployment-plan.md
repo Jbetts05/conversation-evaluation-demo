@@ -1,6 +1,6 @@
 # Conversation Lab deployment plan
 
-Status: Validated - UI asset/configuration refresh update
+Status: Deployed - cache-safe UI and current Astra judge display
 
 ## Approved scope
 
@@ -210,6 +210,12 @@ Update validation: 30 Node tests passed; the real-browser stale-configuration
 regression refreshed a simulated Mini catalog to the actual Astra configuration,
 showed output_quality as 1/1 with distinct component labels, and loaded versioned
 assets. No model, identity, inference configuration, or infrastructure changes.
+
+Deployment 38451604971 successfully published revision
+72b6f870d12d60b002561d17621d838b33208610. The hosted browser regression confirmed
+that an old Mini configuration refreshes to the actual Astra setting, the binary
+output_quality gate displays 1/1, and its components have distinct labels.
+Hosted HTML returns no-cache and references content-addressed assets.
 
 ## Files and data lifecycle
 
