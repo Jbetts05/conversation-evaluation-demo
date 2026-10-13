@@ -7,3 +7,4 @@ api/local.settings.json
 test-results/
 playwright-report/
 infra/main.json
+.impeccable/hook.cache.json
