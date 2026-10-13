@@ -10,3 +10,4 @@ infra/main.json
 .impeccable/hook.cache.json
 web/index.html
 web/assets/
+.azure/deployment-plan.md

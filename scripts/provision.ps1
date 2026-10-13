@@ -1,9 +1,13 @@
 param(
-    [string]$Subscription = '556dc8cb-5da1-41d7-8a10-1be2cd6de16e',
-    [string]$ResourceGroup = 'rg-receipt-benchmark',
+    [Parameter(Mandatory)]
+    [string]$Subscription,
+    [Parameter(Mandatory)]
+    [string]$ResourceGroup,
     [string]$Name = 'conversation-evaluation-demo',
-    [string]$Location = 'westeurope',
-    [string]$Repository = 'Jbetts05/conversation-evaluation-demo'
+    [Parameter(Mandatory)]
+    [string]$Location,
+    [Parameter(Mandatory)]
+    [string]$Repository
 )
 
 $ErrorActionPreference = 'Stop'

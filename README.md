@@ -1,5 +1,7 @@
 # Conversation Lab
 
+![Animated product walkthrough: a fictional billing and roaming conversation is evaluated by GPT-6 Astra at turn and conversation level](docs/conversation-lab.svg)
+
 **Good answers. A good conversation?**
 
 A lightweight, anonymous Microsoft Foundry demo showing the difference between
@@ -10,6 +12,17 @@ containers, application database, or visitor sign-in.
 **Live chat:** GPT-6 Luna (`gpt-6-luna`). **Evaluation judge:** GPT-6 Astra
 (`gpt-6-astra`), using a stronger model to assess Luna's conversations. Both
 the built-in metrics and the custom rubric use Astra.
+
+**What you can explore:** multi-topic conversations, interrupted requests, memory
+and corrections, tool evidence, paired good/faulty examples, and the difference
+between answer quality and end-to-end task completion.
+
+The animation uses recorded scores from a fictional Astra example. Its timing is
+illustrative, not an inference-latency claim. The source is self-hostable; a live
+deployment requires your own Foundry project, model deployments and credentials.
+
+**Start here:** [Turn or conversation evaluation? A practical human guide](docs/evaluation-guide.md)
+— when to use each, why it matters, and how to do it correctly.
 
 ## Use the demo
 
@@ -126,17 +139,54 @@ credential-safe anonymous endpoints.
 
 Node.js 22 or later is required. Runtime packages are pinned in
 `api/package.json` and locked in `api/package-lock.json`.
-Install development dependencies only in an isolated environment, never globally.
-In this workspace they live under the verified `.venv\node` environment; point
-`NODE_PATH` to its `node_modules` directory when running the local server.
+Python is used only to create an isolated development environment; the application
+itself is Node.js. Install dependencies inside that environment, never globally.
+
+Clone the repository, then run this Windows PowerShell quickstart:
+
+```powershell
+git clone https://github.com/Jbetts05/conversation-evaluation-demo.git
+Set-Location conversation-evaluation-demo
+python -m venv .venv
+& .\.venv\Scripts\python.exe -c "import sys; assert sys.prefix != sys.base_prefix"
+$env:VIRTUAL_ENV = (Resolve-Path .venv).Path
+npm install --prefix .venv\node --ignore-scripts --no-audit --no-fund @azure/ai-projects@2.8.0 @azure/identity@4.13.3 @azure/functions@4.16.5
+$env:NODE_PATH = (Resolve-Path .venv\node\node_modules).Path
+```
+
+For local live calls, authenticate your own Azure CLI identity and give it the
+[documented Foundry evaluation permissions](https://learn.microsoft.com/azure/foundry/observability/how-to/evaluation-permissions).
+Set these values to your own project and actual deployment names:
+
+```powershell
+az login
+$env:FOUNDRY_PROJECT_ENDPOINT = "https://<account>.services.ai.azure.com/api/projects/<project>"
+$env:FOUNDRY_JUDGE_DEPLOYMENT = "<your-stronger-judge-deployment>"
+$env:FOUNDRY_CHAT_DEPLOYMENT = "<your-chat-deployment>"
+node scripts\local-config.mjs
+```
+
+The helper creates ignored `.local.env` settings and a random run-signing key
+without printing credentials. `.local.env.example` documents the fields.
+Without live configuration, the app can still inspect prepared conversations,
+export transcripts, and show the genuine recorded runs.
 
 ```powershell
 node scripts\build-datasets.mjs
 node scripts\build-datasets.mjs --check
 node scripts\build-web.mjs
 node --test
+```
+
+To enable live evaluation, run `node scripts\calibrate.mjs` once after configuration.
+It registers the rubric and performs **billable** smoke runs. Then start the app:
+
+```powershell
 node scripts\server.mjs
 ```
+
+Open `http://127.0.0.1:8787`. On macOS/Linux the same Node commands work; adapt the
+virtual-environment activation, paths and environment-variable syntax.
 
 Edit `web/index.template.html`, not the generated `web/index.html`. The web
 preparation command writes content-versioned assets and the Static Web Apps cache
@@ -150,6 +200,12 @@ errors and verified per-turn coverage.
 
 `scripts\ui-smoke.mjs` exercises real live chat/evaluation, export, refresh, and
 mobile layout with isolated Playwright and an installed Edge browser.
+The core tests require no package installation. Browser checks additionally need
+Playwright in the isolated environment; live browser checks invoke billable models.
+
+Run `npm run release:check` before sharing source. It checks tracked files and Git
+history for known local secrets and targeted credential patterns without printing
+secret values. It is not a comprehensive security audit.
 
 ## Deployment
 
@@ -172,14 +228,25 @@ server-to-server Entra credentials and Foundry User at account scope.
 Managed Static Web Apps Functions do not support managed identity; credentials
 stay in encrypted server application settings, never in the browser or repository.
 Rotate credentials before expiry and update both server settings and local
-protected configuration. The current dedicated demo credential expires
-2027-04-11; the provisioning helper does not create or rotate identities.
+protected configuration. Credential expiry depends on your own identity
+configuration; the provisioning helper does not create or rotate identities.
 
-`scripts\provision.ps1` is scoped to the maintainer's approved receipt-benchmark
-environment. Review its subscription, group, site, and repository parameters
-before running it elsewhere. `infra\main.bicep` creates only the new Static Web App
-and does not modify the existing Decision One demo or create model deployments.
+`scripts\provision.ps1` requires your subscription, resource group, location and
+GitHub repository explicitly. It does not default to the maintainer's environment.
+Before running it, add an authorised server application identity to your ignored
+local settings; local Azure CLI credentials cannot be used by the hosted backend.
+`infra\main.bicep` creates only a Static Web App, not a Foundry project or models.
 Set `AZURE_STATIC_WEB_APPS_API_TOKEN` as a GitHub Actions repository secret.
+
+```powershell
+.\scripts\provision.ps1 -Subscription "<subscription-id>" `
+  -ResourceGroup "<existing-resource-group>" -Location "<hosting-region>" `
+  -Name "<your-site-name>" -Repository "<owner/repository>"
+```
+
+The helper sets encrypted server settings and the repository deployment secret.
+Review it before execution. Follow your organisation's approval and validation
+process before provisioning resources or assigning identity permissions.
 
 **Anonymous live inference/evaluation is billable.** Each API instance limits
 active billable submission/chat operations to four and starts to 24 per minute.
@@ -191,3 +258,6 @@ The input ceiling is 100 KB and 20 user turns. Import accepts one complete
 conversation at a time. Live chat is text-only and does not execute tools;
 prepared tool examples are synthetic, read-only traces. Foundry portal report
 links/administration may require operator access, but the demo's results do not.
+
+See [SECURITY.md](SECURITY.md) for data-handling, anonymous-use and credential
+guidance. No open-source license file is included.

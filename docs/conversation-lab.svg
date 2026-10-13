@@ -1,0 +1,164 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1120" height="760" viewBox="0 0 1120 760" role="img" aria-labelledby="title description">
+  <title id="title">Conversation Lab: good answers, a good conversation?</title>
+  <desc id="description">An illustrative product walkthrough shows a fictional billing request interrupted by a roaming question. The full transcript goes to GPT-6 Astra for evaluation. A recorded faulty example passed two of four turn assessments but failed task completion because the billing instructions were dropped. Live chat uses GPT-6 Luna. Animation timing is illustrative, not measured model latency or a benchmark.</desc>
+  <style>
+    :root {
+      color-scheme: light;
+      --cp-bg: #f7f4ef;
+      --cp-surface: #ffffff;
+      --cp-surface-soft: #f5f5f5;
+      --cp-border: #dedede;
+      --cp-text: #242424;
+      --cp-text-muted: #5c5c5c;
+      --cp-text-soft: #6f6f6f;
+      --cp-accent: #b11f4b;
+      --cp-accent-soft: rgba(177, 31, 75, 0.08);
+      --cp-accent-fg: #ffffff;
+      --cp-danger: #dc2626;
+    }
+    text { font-family: "Segoe UI", Aptos, Calibri, -apple-system, BlinkMacSystemFont, sans-serif; fill: var(--cp-text); }
+    .background { fill: var(--cp-bg); stroke: var(--cp-border); }
+    .surface { fill: var(--cp-surface); stroke: var(--cp-border); }
+    .soft { fill: var(--cp-surface-soft); }
+    .accent-soft { fill: var(--cp-accent-soft); }
+    .accent { fill: var(--cp-accent); }
+    .on-accent { fill: var(--cp-accent-fg); }
+    .muted { fill: var(--cp-text-muted); }
+    .subtle { fill: var(--cp-text-soft); }
+    .danger { fill: var(--cp-danger); }
+    .brand { font-size: 14px; font-weight: 650; letter-spacing: .5px; }
+    .heading { font-size: 38px; font-weight: 650; letter-spacing: -1.1px; }
+    .subtitle { font-size: 18px; }
+    .eyebrow { font-size: 11px; font-weight: 650; letter-spacing: 1.5px; }
+    .label { font-size: 12px; font-weight: 600; }
+    .body { font-size: 14px; }
+    .small { font-size: 12px; }
+    .model { font-size: 22px; font-weight: 650; letter-spacing: -.5px; }
+    .card-title { font-size: 19px; font-weight: 650; letter-spacing: -.4px; }
+    .score { font-size: 40px; font-weight: 650; letter-spacing: -1px; }
+    .line { fill: none; stroke: var(--cp-border); stroke-width: 2; }
+    .icon { fill: none; stroke: var(--cp-accent); stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+    .packet { fill: none; stroke: var(--cp-accent); stroke-width: 3; stroke-linecap: round; stroke-dasharray: 10 270; opacity: 0; animation: route 14s linear infinite; }
+    .result { animation: reveal 14s ease-in-out infinite; }
+    .arrival { animation: transcript 14s ease-in-out infinite both; }
+    .arrival-two { animation-delay: .8s; }
+    .arrival-three { animation-delay: 1.6s; }
+    .pending { opacity: 0; animation: pending 14s ease-in-out infinite; }
+    .judge-ring { fill: none; stroke: var(--cp-accent); stroke-width: 2; opacity: 0; animation: pulse 14s ease-out infinite; transform-box: fill-box; transform-origin: center; }
+    @keyframes transcript {
+      0%, 4% { opacity: 0; transform: translateY(3px); }
+      12%, 88% { opacity: 1; transform: translateY(0); }
+      97%, 100% { opacity: 0; transform: translateY(3px); }
+    }
+    @keyframes route {
+      0%, 27% { stroke-dashoffset: 12; opacity: 0; }
+      32% { opacity: 1; }
+      48% { stroke-dashoffset: -260; opacity: 1; }
+      52%, 100% { stroke-dashoffset: -260; opacity: 0; }
+    }
+    @keyframes reveal {
+      0%, 48% { opacity: 0; transform: translateY(4px); }
+      58%, 88% { opacity: 1; transform: translateY(0); }
+      97%, 100% { opacity: 0; transform: translateY(4px); }
+    }
+    @keyframes pending {
+      0%, 28% { opacity: 0; }
+      34%, 46% { opacity: 1; }
+      54%, 100% { opacity: 0; }
+    }
+    @keyframes pulse {
+      0%, 27% { opacity: 0; transform: scale(1); }
+      32% { opacity: .7; transform: scale(1); }
+      49% { opacity: 0; transform: scale(2.1); }
+      100% { opacity: 0; transform: scale(2.1); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .packet, .pending, .judge-ring { animation: none; opacity: 0; }
+      .arrival, .result { animation: none; opacity: 1; transform: none; }
+    }
+  </style>
+
+  <rect class="background" x="1" y="1" width="1118" height="758" rx="20"/>
+  <rect class="accent" x="40" y="38" width="12" height="12" rx="4"/>
+  <text class="brand" x="64" y="49">Conversation Lab</text>
+  <text class="small subtle" x="832" y="49">Microsoft Foundry / no sign-in</text>
+  <text class="heading" x="40" y="111">Good answers. A good conversation?</text>
+  <text class="subtitle muted" x="40" y="148">One transcript. Two perspectives. Look beyond the last answer.</text>
+  <rect class="surface" x="40" y="166" width="233" height="27" rx="8"/>
+  <text class="small muted" x="52" y="184">Live chat: GPT-6 Luna</text>
+  <rect class="accent-soft" x="285" y="166" width="251" height="27" rx="8"/>
+  <text class="small accent" x="297" y="184">Evaluation judge: GPT-6 Astra</text>
+
+  <rect class="surface" x="40" y="210" width="420" height="444" rx="16"/>
+  <text class="eyebrow muted" x="62" y="238">FICTIONAL, AUTHORED EXAMPLE</text>
+  <text class="card-title" x="62" y="268">Billing / roaming / billing</text>
+
+  <g class="arrival">
+    <rect class="accent-soft" x="104" y="285" width="332" height="38" rx="10"/>
+    <text class="body" x="116" y="309">Help me dispute a GBP 6 charge.</text>
+    <rect class="soft" x="62" y="331" width="326" height="36" rx="10"/>
+    <text class="body" x="74" y="354">What date was the charge?</text>
+  </g>
+  <g class="arrival arrival-two">
+    <rect class="accent-soft" x="104" y="381" width="332" height="38" rx="10"/>
+    <text class="body" x="116" y="405">First, is France roaming included?</text>
+    <rect class="soft" x="62" y="427" width="374" height="38" rx="10"/>
+    <text class="body" x="74" y="451">Yes. We can return to your dispute.</text>
+  </g>
+  <g class="arrival arrival-three">
+    <rect class="accent-soft" x="104" y="479" width="332" height="52" rx="10"/>
+    <text class="body" x="116" y="500">12 June. Also, how do I enable</text>
+    <text class="body" x="116" y="520">roaming in France?</text>
+    <rect class="soft" x="62" y="539" width="374" height="38" rx="10"/>
+    <text class="body" x="74" y="563">Settings &gt; Mobile &gt; Data roaming.</text>
+  </g>
+  <rect class="accent" x="62" y="598" width="208" height="36" rx="10"/>
+  <path class="on-accent" d="m79 608 10 8-10 8z"/>
+  <text class="label on-accent" x="101" y="621">Evaluate conversation</text>
+  <text class="small subtle" x="286" y="621">Capture / edit / export</text>
+
+  <path class="line" d="M460 426h50"/>
+  <path class="line" d="M718 426h26V312h28"/>
+  <path class="line" d="M744 426v122h28"/>
+  <path class="packet" pathLength="270" d="M460 426h50"/>
+  <path class="packet" pathLength="270" d="M718 426h26V312h28"/>
+  <path class="packet" pathLength="270" d="M718 426h26v122h28"/>
+
+  <rect class="surface" x="510" y="329" width="208" height="194" rx="16"/>
+  <rect class="accent-soft" x="590" y="348" width="48" height="48" rx="12"/>
+  <circle class="judge-ring" cx="614" cy="372" r="17"/>
+  <path class="icon" d="M604 364h20v16h-20zM610 359v5m8-5v5m-8 6h8m-8 5h6"/>
+  <text class="eyebrow muted" x="532" y="421">STRONGER JUDGE</text>
+  <text class="model" x="532" y="451">GPT-6 Astra</text>
+  <text class="small muted" x="532" y="477">Full transcript + evidence</text>
+  <text class="small subtle" x="532" y="500">Seven built-ins + rubric</text>
+  <text class="small accent pending" x="532" y="551">Evaluating...</text>
+
+  <rect class="surface" x="772" y="210" width="308" height="194" rx="16"/>
+  <text class="eyebrow accent" x="794" y="239">TURN BY TURN</text>
+  <text class="card-title" x="794" y="270">Assess each reply</text>
+  <text class="small subtle" x="794" y="294">Relevance + intent resolution</text>
+  <g class="result" data-recorded-metric="faulty-turn-pass-count">
+    <text class="score" x="794" y="346">2/4</text>
+    <text class="body muted" x="879" y="342">scored turns pass</text>
+    <text class="small muted" x="794" y="379">Prior context only / no future leakage</text>
+  </g>
+  <text class="body muted pending" x="794" y="344">Scoring individual turns...</text>
+
+  <rect class="surface" x="772" y="424" width="308" height="230" rx="16"/>
+  <text class="eyebrow accent" x="794" y="453">WHOLE CONVERSATION</text>
+  <text class="card-title" x="794" y="484">Did the task get done?</text>
+  <g class="result" data-recorded-metric="faulty-task-completion">
+    <text class="score danger" x="794" y="535">0/1</text>
+    <text class="body danger" x="879" y="529">Task completion: fail</text>
+    <rect class="accent-soft" x="794" y="550" width="264" height="59" rx="10"/>
+    <text class="body" x="806" y="575">The roaming question was answered.</text>
+    <text class="body" x="806" y="596">The dispute instructions were dropped.</text>
+  </g>
+  <text class="body muted pending" x="794" y="533">Checking the whole journey...</text>
+  <text class="small subtle" x="794" y="633">Inspect criteria, components and reasons</text>
+
+  <path class="line" d="M40 676h1040"/>
+  <text class="small muted" x="40" y="701">Prepared examples / Live chat / Compare versions / Inspect evidence / Export reports</text>
+  <text class="small subtle" x="40" y="735">Illustrative timing. Scores shown are from a recorded, fictional Astra evaluation - not a benchmark.</text>
+</svg>
