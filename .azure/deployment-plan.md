@@ -1,6 +1,6 @@
 # Conversation Lab deployment plan
 
-Status: Deployed
+Status: Validated - Astra judge and seven-evaluator profile update
 
 ## Approved scope
 
@@ -19,7 +19,7 @@ The existing Decision One application remains untouched.
 - Existing Foundry account region: swedencentral
 - Existing project: receipt-benchmark
 - Project endpoint: https://aireceiptbench556dc8.services.ai.azure.com/api/projects/receipt-benchmark
-- Judge deployment: receipt-gpt-54-mini
+- Judge deployment: gpt-6-astra (GPT-6 Astra), compatibility verified and live server setting updated
 - Chat deployment: gpt-6-luna
 - Backend application ID: 472d4608-3678-40cd-904b-a4bfbeeb7f9a
 - Credential expiry: 2027-04-11; values are never in source control
@@ -138,6 +138,51 @@ Deployment packaging initially exposed an npm parent-package file link. The
 manifest/lockfile were corrected and a regression check prevents recursive local
 links from entering the managed API artifact. The subsequent deployment and
 hosted real evaluations completed successfully.
+
+## Approved judge/profile update
+
+The user requested Astra as the stronger evaluation judge while retaining Luna
+for live chat, and selected all seven documented conversation-level built-ins
+plus the custom multi-topic rubric.
+
+The updated conversation profile requests output_quality, tool_use_quality,
+deflection_rate, customer_satisfaction, task_completion, coherence, groundedness,
+and the existing rubric. Composite and individual metrics deliberately overlap
+for educational comparison and must not be treated as independent votes.
+Turn-only relevance/intent resolution remain confined to the turn profile.
+
+Composite guidance recommends GPT-5.6-family judges. Real Astra runs in this
+resource nevertheless completed both output_quality and tool_use_quality,
+including a tool-evidence case with all eight primary metrics completed.
+The no-tools case returned genuine tool_use_quality applicability skips, which
+are distinctly displayed and not mistaken for execution errors or quality passes.
+
+Recorded reference exports must match both the configured judge and current
+testing criteria. Historical Mini runs retain their actual model provenance.
+
+Local browser end-to-end checks verified all eight conversation-level cards,
+native score scales, composite component grouping, real Astra model attribution,
+capability-free report exports, and Luna remaining the live chat model.
+All four published reference runs have been regenerated with Astra and the
+current seven-built-in-plus-rubric profile.
+
+Update validation, 2026-10-13:
+
+| Check | Command | Result |
+|-------|---------|--------|
+| Profile/results/reference regressions | node --test | 28 passed |
+| Browser module syntax | node --check web/app.js; node --check web/metrics.js | Passed |
+| Static security/assets | node scripts/build-web.mjs; node scripts/build-datasets.mjs --check | Passed |
+| Real tool composite | node scripts/tool-smoke.mjs against local SDK API, EXPECTED_JUDGE=gpt-6-astra | All seven built-ins plus rubric completed with actual tool evidence |
+| Real browser flow | node scripts/ui-smoke.mjs, EXPECTED_JUDGE/EXPECTED_MODEL=gpt-6-astra | Eight conversation cards, correct underlying model, live Luna chat, export and resume passed |
+| Infrastructure/identity | No template, resource, role, credential or endpoint changes | Existing validated infrastructure and identity reused |
+
+The first calibration command treated genuine no-tool applicability skips as
+failures in its own verifier. Raw runs had completed with no execution errors.
+The shared result inspector now allows only explicit tool_use_quality
+not-applicable results when no tool definitions were supplied, while surfacing
+unexpected skips and missing composite gates. The original raw results are
+preserved; no labels or scores were rewritten.
 
 ## Files and data lifecycle
 

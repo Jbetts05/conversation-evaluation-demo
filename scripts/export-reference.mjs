@@ -1,5 +1,11 @@
 import { readdir, readFile, writeFile } from "node:fs/promises";
+import { isDeepStrictEqual } from "node:util";
+import { criteria } from "../api/lib/core.mjs";
+import { inspectResults } from "../api/lib/evaluation-results.mjs";
 
+process.loadEnvFile(new URL("../.local.env", import.meta.url));
+const judge = process.env.FOUNDRY_JUDGE_DEPLOYMENT;
+if (!judge) throw new Error("Configure the judge deployment before exporting reference runs.");
 const folder = new URL("../.foundry/results/", import.meta.url);
 const names = (await readdir(folder)).filter((name) => /^conversation-v1-00[78]-(turn|conversation)-.*\.json$/.test(name)).sort().reverse();
 const selected = new Map();
@@ -7,11 +13,14 @@ for (const name of names) {
   const job = JSON.parse(await readFile(new URL(name, folder), "utf8"));
   const key = `${job.entry.conversation_id}-${job.level}`;
   if (selected.has(key)) continue;
+  if (!isDeepStrictEqual(job.definition.testing_criteria, criteria(job.level, judge, process.env.FOUNDRY_RUBRIC_NAME))) continue;
   if (job.status !== "completed" || job.run.result_counts?.errored) continue;
+  const inspection = inspectResults(job.items, job.definition.testing_criteria.map((criterion) => criterion.name), { noToolDefinitions: job.item.tool_definitions.length === 0 });
+  if (inspection.errors || inspection.warnings.length) continue;
   if (job.level === "turn" && job.items.length !== job.item.messages.filter((message) => message.role === "user").length) continue;
   selected.set(key, job);
 }
-if (selected.size !== 4) throw new Error("Four completed, explicitly per-turn/conversation reference runs are required.");
+if (selected.size !== 4) throw new Error(`Four completed per-turn/conversation reference runs using ${judge} are required.`);
 const runs = [...selected.values()].map((job) => ({
   title: `${job.entry.variant === "faulty" ? "Faulty" : "Well handled"} · recorded`,
   source: "recorded-foundry-run",

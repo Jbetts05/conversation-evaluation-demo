@@ -39,10 +39,17 @@ test("run handles reject tampering, expiry and cross-purpose use", () => {
 test("uses explicit metric levels and requires a registered conversation rubric", () => {
   assert.deepEqual(criteria("turn", "judge", "rubric").map((item) => item.name), ["relevance", "intent_resolution"]);
   assert.ok(criteria("conversation", "judge", "rubric").some((item) => item.name === "multi_topic_rubric"));
+  assert.deepEqual(criteria("conversation", "judge", "rubric").map((item) => item.name), [
+    "output_quality", "tool_use_quality", "deflection_rate",
+    "customer_satisfaction", "task_completion", "coherence", "groundedness", "multi_topic_rubric",
+  ]);
   for (const level of ["turn", "conversation"]) {
     for (const criterion of criteria(level, "judge", "rubric")) {
-      if (["intent_resolution", "task_completion", "multi_topic_rubric"].includes(criterion.name)) {
+      if (["intent_resolution", "output_quality", "tool_use_quality", "deflection_rate", "task_completion", "groundedness", "multi_topic_rubric"].includes(criterion.name)) {
         assert.equal(criterion.data_mapping.tool_definitions, "{{item.tool_definitions}}");
+      }
+      if (["output_quality", "tool_use_quality"].includes(criterion.name)) {
+        assert.equal(criterion.initialization_parameters.evaluation_level, level);
       }
     }
   }

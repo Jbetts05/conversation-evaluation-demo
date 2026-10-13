@@ -1,12 +1,9 @@
+import { metricTitle, scoreText, resultState, groupMetrics } from "./metrics.js";
+
 (() => {
   "use strict";
   const $ = (id) => document.getElementById(id);
   const storageKey = "conversation-lab-runs-v1";
-  const metricNames = {
-    relevance: "Relevance", intent_resolution: "Intent resolution", task_completion: "Task completion",
-    customer_satisfaction: "Customer satisfaction", coherence: "Coherence", groundedness: "Groundedness",
-    multi_topic_rubric: "Multi-topic rubric",
-  };
   let corpus;
   let mode = "examples";
   let current;
@@ -131,25 +128,12 @@
     renderConversation();
     controls();
   }
-  function scoreText(result) {
-    if (result.score === null || result.score === undefined) return "Not scored";
-    if (typeof result.score === "boolean") return result.score ? "Pass" : "Fail";
-    const scale = result.name === "multi_topic_rubric" ? "/1" : ["task_completion"].includes(result.name) ? "/1" : "/5";
-    return `${Number.isFinite(result.score) ? Number(result.score.toFixed(2)) : String(result.score)}${scale}`;
-  }
-  function resultState(result) {
-    if (["error", "errored", "skipped", "not_applicable", "not_scored", "failed"].includes(result.status)) return "skipped";
-    if (result.score === null || result.score === undefined) return "skipped";
-    if (result.passed === true || result.label === "pass") return "pass";
-    if (result.passed === false || result.label === "fail") return "fail";
-    return "";
-  }
-  function renderMetric(result) {
+  function renderMetric(result, components = []) {
     const node = element("div", "metric");
     const heading = element("div", "metric-heading");
-    heading.append(element("span", "", metricNames[result.name] ?? result.name ?? result.metric ?? "Evaluator"));
+    heading.append(element("span", "", metricTitle(result)));
     const state = resultState(result);
-    heading.append(element("span", `score ${state}`, ["error", "errored", "failed"].includes(result.status) ? "Evaluator error" : result.status === "skipped" ? "Skipped" : scoreText(result)));
+    heading.append(element("span", `score ${state}`, scoreText(result)));
     node.append(heading);
     if (result.reason) {
       const why = element("details");
@@ -157,7 +141,13 @@
       why.append(element("p", "reason", result.reason));
       node.append(why);
     }
-    if (result.threshold !== undefined) node.append(element("p", "muted", `Threshold: ${result.threshold} · ${state === "pass" ? "Pass" : state === "fail" ? "Fail" : result.status ?? "Scored"}`));
+    if (Number.isFinite(result.threshold) && state !== "skipped") node.append(element("p", "muted", `Threshold: ${result.threshold} · ${state === "pass" ? "Pass" : state === "fail" ? "Fail" : result.status ?? "Scored"}`));
+    if (components.length) {
+      const detail = element("details");
+      detail.append(element("summary", "", `Component scores (${components.length})`));
+      for (const component of components) detail.append(renderMetric(component));
+      node.append(detail);
+    }
     const dimensions = element("details");
     dimensions.append(element("summary", "", "Rubric dimensions and explanations"));
     for (const dimension of result.properties?.dimension_scores ?? []) {
@@ -177,6 +167,8 @@
       card.append(element("span", "eyebrow", job.level === "turn" ? "Turn by turn" : "Whole conversation"));
       card.append(element("h3", "", job.title));
       card.append(element("p", `result-status${job.error ? " error" : ""}`, job.error ?? (job.source === "recorded-foundry-run" ? `Recorded · ${job.result.provenance.recorded_at}` : job.status ?? "Preparing")));
+      const judge = job.result?.provenance?.judge ?? job.definition?.testing_criteria?.[0]?.initialization_parameters?.deployment_name;
+      if (judge) card.append(element("p", "muted", `Judge: ${judge}`));
       if (job.result?.status === "completed" && (job.result.result_counts?.errored || job.result.item_errors)) {
         card.append(element("p", "error", "Some evaluator items errored. This is not a successful quality assessment."));
       }
@@ -188,7 +180,7 @@
           card.append(element("p", "muted", turn ? `Turn ${turn}` : `Scored item ${index + 1}`));
         }
         if (item.status && item.status !== "completed") card.append(element("p", "muted", `Item status: ${item.status}`));
-        for (const result of item.results ?? []) card.append(renderMetric(result));
+        for (const group of groupMetrics(item.results ?? [])) card.append(renderMetric(group.primary, group.components));
       }
       if (job.handle && !["completed", "failed", "canceled", "cancelled"].includes(job.status)) {
         const actions = element("div", "job-actions");
@@ -270,7 +262,8 @@
     status("Submitting real Foundry runs. Results may take several minutes.");
     await Promise.all(jobs.map(submitJob));
     busy = false;
-    status(jobs.some((job) => job.error || job.result?.error || job.result?.result_counts?.errored) ? "One or more runs need attention. See their status and details." : "Evaluation status updated. Inspect the scores and explanations.", jobs.some((job) => job.error));
+    const needsAttention = jobs.some((job) => job.error || job.result?.error || job.result?.result_counts?.errored || job.result?.item_errors || job.result?.warnings?.length);
+    status(needsAttention ? "One or more runs need attention. See their status and details." : "Evaluation status updated. Inspect the scores and explanations.", needsAttention);
     renderConversation(); controls();
   }
   function download(name, content, type) {

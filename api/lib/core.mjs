@@ -102,21 +102,29 @@ export function createHandles(secret, now = () => Date.now()) {
   };
 }
 
-export function criteria(level, judge, rubricName, tools = false) {
+export function criteria(level, judge, rubricName) {
   demand(["turn", "conversation"].includes(level), "Unknown evaluation level.");
   const names = level === "turn"
     ? ["relevance", "intent_resolution"]
-    : ["task_completion", "customer_satisfaction", "coherence"];
-  if (level === "conversation" && tools) names.push("groundedness");
+    : [
+      "output_quality", "tool_use_quality", "deflection_rate",
+      "customer_satisfaction", "task_completion", "coherence", "groundedness",
+    ];
+  const toolInputs = new Set([
+    "intent_resolution", "output_quality", "tool_use_quality",
+    "deflection_rate", "task_completion", "groundedness",
+  ]);
   const items = names.map((name) => ({
     type: "azure_ai_evaluator",
     name,
     evaluator_name: `builtin.${name}`,
-    initialization_parameters: { deployment_name: judge },
+    initialization_parameters: {
+      deployment_name: judge,
+      ...(["output_quality", "tool_use_quality"].includes(name) ? { evaluation_level: level } : {}),
+    },
     data_mapping: {
       messages: "{{item.messages}}",
-      ...(["intent_resolution", "task_completion", "groundedness"].includes(name)
-        ? { tool_definitions: "{{item.tool_definitions}}" } : {}),
+      ...(toolInputs.has(name) ? { tool_definitions: "{{item.tool_definitions}}" } : {}),
     },
   }));
   if (level === "conversation") {
@@ -132,7 +140,7 @@ export function criteria(level, judge, rubricName, tools = false) {
   return items;
 }
 
-export function evaluationDefinition(level, judge, rubricName, tools, hash) {
+export function evaluationDefinition(level, judge, rubricName, hash) {
   return {
     name: `Conversation Lab ${level} ${hash.slice(0, 12)}`,
     data_source_config: {
@@ -144,7 +152,7 @@ export function evaluationDefinition(level, judge, rubricName, tools, hash) {
       },
       include_sample_schema: false,
     },
-    testing_criteria: criteria(level, judge, rubricName, tools),
+    testing_criteria: criteria(level, judge, rubricName),
   };
 }
 

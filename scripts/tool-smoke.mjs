@@ -27,9 +27,13 @@ assert.equal(result.status, "completed");
 assert.equal(result.item_errors, 0);
 assert.deepEqual(result.warnings, []);
 const metrics = result.items.flatMap((item) => item.results ?? []);
-for (const name of ["groundedness", "multi_topic_rubric"]) {
-  const metric = metrics.find((item) => item.name === name);
+for (const name of [
+  "output_quality", "tool_use_quality", "deflection_rate", "customer_satisfaction",
+  "task_completion", "coherence", "groundedness", "multi_topic_rubric",
+]) {
+  const metric = metrics.find((item) => item.name === name && item.metric === name);
   assert.ok(metric);
   assert.equal(metric.status, "completed");
 }
-console.log(JSON.stringify({ scenario: entry.scenario_id, run_id: submitted.run_id, scores: metrics.map((item) => ({ name: item.name, score: item.score, passed: item.passed })) }));
+if (process.env.EXPECTED_JUDGE) assert.equal(result.provenance.judge, process.env.EXPECTED_JUDGE);
+console.log(JSON.stringify({ scenario: entry.scenario_id, run_id: submitted.run_id, judge: result.provenance.judge, scores: metrics.filter((item) => item.name === item.metric).map((item) => ({ name: item.name, score: item.score, passed: item.passed })) }));

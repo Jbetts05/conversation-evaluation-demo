@@ -7,6 +7,10 @@ judging responses and judging the complete interaction. Plain HTML/CSS/JavaScrip
 a Node.js 22 managed API, and Azure Static Web Apps. No frontend framework,
 containers, application database, or visitor sign-in.
 
+**Live chat:** GPT-6 Luna (`gpt-6-luna`). **Evaluation judge:** GPT-6 Astra
+(`gpt-6-astra`), using a stronger model to assess Luna's conversations. Both
+the built-in metrics and the custom rubric use Astra.
+
 ## Use the demo
 
 1. Choose an authored example and a well-handled or faulty version.
@@ -38,9 +42,19 @@ The application has no globally browsable public transcript history.
 | View | Measures |
 |------|----------|
 | Turn by turn | Relevance and intent resolution |
-| Whole conversation | Task completion, customer satisfaction, coherence |
+| Whole conversation | All seven documented built-ins: output quality, tool-use quality, deflection rate, customer satisfaction, task completion, coherence, groundedness |
 | Conversation rubric (preview) | Topic switching, request coverage, context retention, corrections, context separation, evidence/action integrity, recovery/clarification |
-| Prepared tool cases | Additional groundedness with synthetic function-tool evidence |
+| Prepared tool cases | Synthetic function-tool evidence for actual tool-use and groundedness scoring |
+
+Both composite gates have expandable component scores. Individual coherence,
+groundedness and task completion are deliberately retained alongside output
+quality for educational comparison; these overlapping judgments are not
+independent votes. Deflection rate retains its returned score and native verdict,
+not an invented higher-is-better quality scale.
+
+For conversations without tool definitions, tool-use quality reports the
+service's genuine **not applicable** result. Other unexpected skips, missing
+composite gates, and evaluator errors are surfaced rather than presented as passes.
 
 Each completed user/assistant exchange is submitted as its own prefix for
 turn-level scoring. Earlier context is retained, but future messages are excluded.

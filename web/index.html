@@ -68,7 +68,7 @@
     }
   </style>
   <link rel="stylesheet" href="/styles.css">
-  <script src="/app.js" defer></script>
+  <script type="module" src="/app.js"></script>
 </head>
 <body>
   <div class="page">
@@ -122,7 +122,7 @@
           <h2>The reply.<br>The journey.</h2>
           <p>Did each answer address the question? Did the conversation accomplish what the user actually needed?</p>
           <div class="perspective"><span class="step">01</span><div><h3>Turn by turn</h3><p>Relevance and intent resolution.</p></div></div>
-          <div class="perspective"><span class="step">02</span><div><h3>Whole conversation</h3><p>Completion, satisfaction, coherence and a multi-topic rubric.</p></div></div>
+          <div class="perspective"><span class="step">02</span><div><h3>Whole conversation</h3><p>Seven documented built-in evaluators, plus a multi-topic rubric.</p></div></div>
           <div class="run-actions">
             <button id="evaluate" class="primary" disabled>Evaluate conversation <span aria-hidden="true">↗</span></button>
             <button id="compare" class="secondary" disabled>Compare both versions</button>
@@ -134,6 +134,7 @@
             <summary>Judge · rubric · configuration</summary>
             <p id="configuration" class="muted"></p>
             <p class="muted">Rubric evaluation is preview and model-judged. Scores are not ground truth or a customer benchmark.</p>
+            <p class="muted">This demonstration includes both composite and individual metrics, so some quality dimensions overlap. They are not independent votes or one combined accuracy score. Tool-use metrics may be not applicable without tool calls.</p>
             <div id="rubric"></div>
           </details>
         </aside>

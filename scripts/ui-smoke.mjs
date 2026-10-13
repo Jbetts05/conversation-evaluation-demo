@@ -30,12 +30,25 @@ try {
   await page.waitForFunction(() => [...document.querySelectorAll("#results .result-status")].length === 2
     && [...document.querySelectorAll("#results .result-status")].every((node) => node.textContent === "completed"), null, { timeout: 300_000 });
   assert.ok(await page.locator("#results .metric").count() >= 6);
+  const conversationMetrics = page.locator("#results .result-card").nth(1).locator(":scope > .metric");
+  assert.equal(await conversationMetrics.count(), 8);
+  assert.deepEqual(await conversationMetrics.locator(":scope > .metric-heading > span:first-child").allTextContents(), [
+    "Output quality", "Tool-use quality", "Deflection rate", "Customer satisfaction",
+    "Task completion", "Coherence", "Groundedness", "Multi-topic rubric",
+  ]);
+  assert.equal(await conversationMetrics.nth(1).locator(":scope > .metric-heading > .score").innerText(), "Not applicable");
   const downloadPromise = page.waitForEvent("download");
   await page.locator("#export-report").click();
   const download = await downloadPromise;
   assert.equal(download.suggestedFilename(), "conversation-evaluation-report.json");
   const report = JSON.parse(await readFile(await download.path(), "utf8"));
   assert.ok(report.runs.every((run) => !Object.hasOwn(run, "handle") && !Object.hasOwn(run, "prepared")));
+  if (process.env.EXPECTED_JUDGE) assert.ok(report.runs.every((run) => run.result.provenance.judge === process.env.EXPECTED_JUDGE));
+  if (process.env.EXPECTED_MODEL) {
+    const models = report.runs.flatMap((run) => run.result.items.flatMap((item) => item.results.map((metric) => metric.sample?.model))).filter(Boolean);
+    assert.ok(models.length > 0);
+    assert.ok(models.every((model) => model.startsWith(process.env.EXPECTED_MODEL)));
+  }
   await page.reload();
   await page.locator("#results .metric").first().waitFor();
   assert.equal(await page.locator("#results .result-card").count(), 2);

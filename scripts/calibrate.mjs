@@ -4,6 +4,7 @@ import { setTimeout as sleep } from "node:timers/promises";
 import { createFoundry, configuration } from "../api/lib/foundry.mjs";
 import { evaluationDefinition, evaluationRun, snapshot, terminal } from "../api/lib/core.mjs";
 import { loadCorpus } from "../api/lib/application.mjs";
+import { inspectResults } from "../api/lib/evaluation-results.mjs";
 
 const root = new URL("../", import.meta.url);
 process.loadEnvFile(new URL(".local.env", root));
@@ -20,6 +21,7 @@ const existing = [];
 for await (const evaluator of provider.project.evaluators.list()) {
   if (evaluator.name === name) existing.push(evaluator);
 }
+console.log(`Judge deployment: ${config.judge}`);
 let rubric = existing[0];
 if (!rubric) {
   rubric = await provider.project.evaluators.createVersion(name, {
@@ -51,7 +53,7 @@ for (const entry of selected) {
   const row = corpus.rows.find((item) => item.id === entry.conversation_id);
   const item = snapshot(row);
   for (const level of ["turn", "conversation"]) {
-    const createBody = evaluationDefinition(level, config.judge, name, false, entry.transcript_sha256);
+    const createBody = evaluationDefinition(level, config.judge, name, entry.transcript_sha256);
     const evaluation = await provider.createEvaluation(createBody);
     await appendFile(journal, JSON.stringify({ operation: "prepared", evaluation_id: evaluation.id, level, conversation_id: row.id }) + "\n");
     const run = await provider.createRun(evaluation.id, evaluationRun(item, level));
@@ -78,6 +80,11 @@ for (const job of jobs) {
   job.items = job.status === "completed" ? await provider.outputItems(job.evaluation_id, job.run_id) : [];
   await writeFile(new URL(`${job.entry.conversation_id}-${job.level}-${started}.json`, folder), JSON.stringify(job, null, 2) + "\n");
   if (job.status !== "completed" || job.run?.result_counts?.errored) failed = true;
+  const inspection = inspectResults(job.items, job.definition.testing_criteria.map((criterion) => criterion.name), { noToolDefinitions: job.item.tool_definitions.length === 0 });
+  if (inspection.errors || inspection.warnings.length) {
+    failed = true;
+    console.error(JSON.stringify({ run_id: job.run_id, inspection }));
+  }
   const rubricResult = job.items.flatMap((item) => item.results ?? []).find((result) => result.name === "multi_topic_rubric");
   console.log(JSON.stringify({
     variant: job.entry.variant, level: job.level, status: job.status,

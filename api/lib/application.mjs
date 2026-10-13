@@ -2,6 +2,7 @@ import { randomUUID } from "node:crypto";
 import { readFile } from "node:fs/promises";
 import { HttpError, snapshot, transcriptHash, createHandles, evaluationDefinition, evaluationRun, makeLimiter, terminal } from "./core.mjs";
 import { createFoundry } from "./foundry.mjs";
+import { inspectResults } from "./evaluation-results.mjs";
 
 export async function loadCorpus() {
   return JSON.parse(await readFile(new URL("../data/corpus.json", import.meta.url), "utf8"));
@@ -50,13 +51,13 @@ export function application({ corpus, config, providerFactory = () => createFoun
       const item = snapshot(body?.conversation);
       const level = body?.level;
       const hash = transcriptHash(item);
-      const definition = evaluationDefinition(level, config.judge, config.rubricName, item.tool_definitions.length > 0, hash);
+      const definition = evaluationDefinition(level, config.judge, config.rubricName, hash);
       const tokens = handles();
       return limit(async () => {
         const evaluation = await cloud().createEvaluation(definition, signal);
         if (!evaluation.id) throw new HttpError(502, "Foundry did not return an evaluation ID.");
         return {
-          handle: tokens.issue({ purpose: "prepared", evalId: evaluation.id, hash, level, judge: config.judge, rubricName: config.rubricName, rubricVersion: config.rubricVersion, criterionNames: definition.testing_criteria.map((criterion) => criterion.name), requestId: randomUUID() }),
+          handle: tokens.issue({ purpose: "prepared", evalId: evaluation.id, hash, level, judge: config.judge, rubricName: config.rubricName, rubricVersion: config.rubricVersion, criterionNames: definition.testing_criteria.map((criterion) => criterion.name), noToolDefinitions: item.tool_definitions.length === 0, requestId: randomUUID() }),
           evaluation_id: evaluation.id,
           transcript_sha256: hash,
           definition,
@@ -89,20 +90,15 @@ export function application({ corpus, config, providerFactory = () => createFoun
       }
       const run = await cloud().getRun(job.evalId, job.runId, signal);
       const items = run.status === "completed" ? await cloud().outputItems(job.evalId, job.runId, signal) : [];
-      const errors = items.flatMap((item) => item.results ?? []).filter((result) => ["error", "errored", "failed"].includes(result.status));
-      const warnings = [];
-      if (run.status === "completed" && items.length === 0) warnings.push("The run completed but returned no scored items.");
-      for (const item of items) {
-        const names = new Set((item.results ?? []).map((result) => result.name));
-        const missing = job.criterionNames.filter((name) => !names.has(name));
-        if (missing.length) warnings.push(`Item ${item.id}: missing results for ${missing.join(", ")}.`);
-      }
+      const inspection = run.status === "completed"
+        ? inspectResults(items, job.criterionNames, { noToolDefinitions: job.noToolDefinitions === true })
+        : { errors: 0, warnings: [] };
       return {
         status: run.status,
         terminal: terminal(run.status),
         error: run.error ? { code: run.error.code ?? "evaluation_failed", message: "Foundry could not complete this evaluation. Inspect the returned error code and run IDs." } : null,
-        item_errors: errors.length,
-        warnings,
+        item_errors: inspection.errors,
+        warnings: inspection.warnings,
         result_counts: run.result_counts ?? null,
         items,
         report_url: run.report_url ?? null,
