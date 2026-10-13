@@ -1,6 +1,6 @@
 # Conversation Lab deployment plan
 
-Status: Validated
+Status: Deployed
 
 ## Approved scope
 
@@ -98,8 +98,8 @@ native score scales, evaluator errors, and stale-input distinctions are wired.
 - [x] ARM template validation and policy preflight
 - [x] What-if shows only the new site
 - [x] Azure authentication and static role review
-- [ ] Deployment using azure-deploy
-- [ ] Hosted anonymous UI/API/live-call verification
+- [x] Deployment using azure-deploy
+- [x] Hosted anonymous UI/API/live-call verification
 
 ## Validation proof
 
@@ -108,7 +108,7 @@ Validated by: azure-validate, 2026-10-13.
 | Check | Command run | Result | Date |
 |-------|-------------|--------|------|
 | Generated assets | node scripts/build-datasets.mjs --check; node scripts/build-web.mjs | Pass | 2026-10-13 |
-| API/data checks | node --test | 18 tests passed | 2026-10-13 |
+| API/data checks | node --test | 19 tests passed, including deployment link regression | 2026-10-13 |
 | Frontend syntax | node --check web/app.js | Pass | 2026-10-13 |
 | Bicep compilation | az bicep build --file infra/main.bicep | Pass | 2026-10-13 |
 | Template/policy preflight | az deployment group validate, scoped to approved group with infra/main.parameters.json | Succeeded | 2026-10-13 |
@@ -117,11 +117,27 @@ Validated by: azure-validate, 2026-10-13.
 | Assigned policies | az policy assignment list | Three SQL/storage protection sets; no Static Web Apps restriction; ARM preflight passed | 2026-10-13 |
 | Real SDK jobs | node scripts/calibrate.mjs | Four completed runs, no evaluator errors; four turn rows per transcript | 2026-10-13 |
 | Browser end-to-end | node scripts/ui-smoke.mjs | Real anonymous chat, both levels, export, reload and mobile layout passed | 2026-10-13 |
+| Hosted browser end-to-end | TEST_BASE_URL set to deployed site; node scripts/ui-smoke.mjs | Anonymous real chat, both levels, capability-free report export, reload, CSP and mobile layout passed | 2026-10-13 |
+| Prepared tool evaluation | TEST_BASE_URL set to deployed site; node scripts/tool-smoke.mjs | Groundedness and rubric completed; all returned metrics passed on the well-handled tool fixture | 2026-10-13 |
+| Live role verification | az role assignment list at Foundry account scope | Dedicated app has Foundry User at approved resource only | 2026-10-13 |
 
 Static role review: the template contains only the new site, with no managed
 identity to grant. The separately approved application identity uses the resource
 scoped Foundry User role required by the server SDK. No subscription-wide role is
 granted and no inference key is sent to the browser.
+
+## Deployment record
+
+- Live anonymous site: https://kind-sand-00382f503.2.azurestaticapps.net
+- Separate private source: https://github.com/Jbetts05/conversation-evaluation-demo
+- Verified deployment workflow run: 38400916804
+- Verified application revision: 97c25c766dcf4d0e2fb799e58caccae71403f972
+- Existing Decision One site/resources: unchanged
+
+Deployment packaging initially exposed an npm parent-package file link. The
+manifest/lockfile were corrected and a regression check prevents recursive local
+links from entering the managed API artifact. The subsequent deployment and
+hosted real evaluations completed successfully.
 
 ## Files and data lifecycle
 
