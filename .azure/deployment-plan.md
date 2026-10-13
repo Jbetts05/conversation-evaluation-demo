@@ -1,6 +1,6 @@
 # Conversation Lab deployment plan
 
-Status: Validated - Astra judge and seven-evaluator profile update
+Status: Deployed - Astra judge and seven-evaluator profile
 
 ## Approved scope
 
@@ -130,8 +130,8 @@ granted and no inference key is sent to the browser.
 
 - Live anonymous site: https://kind-sand-00382f503.2.azurestaticapps.net
 - Separate private source: https://github.com/Jbetts05/conversation-evaluation-demo
-- Verified deployment workflow run: 38400916804
-- Verified application revision: 97c25c766dcf4d0e2fb799e58caccae71403f972
+- Original verified deployment workflow run: 38400916804
+- Original verified application revision: 97c25c766dcf4d0e2fb799e58caccae71403f972
 - Existing Decision One site/resources: unchanged
 
 Deployment packaging initially exposed an npm parent-package file link. The
@@ -183,6 +183,15 @@ The shared result inspector now allows only explicit tool_use_quality
 not-applicable results when no tool definitions were supplied, while surfacing
 unexpected skips and missing composite gates. The original raw results are
 preserved; no labels or scores were rewritten.
+
+The updated runtime setting and reference assets now use gpt-6-astra; live chat
+remains gpt-6-luna. Deployment 38413889042 successfully published revision
+e965a09a7bfb54a3ac65ba67db1b66f3d7e26b24. Live catalog and recorded-run metadata
+confirm Astra, with eight criteria per conversation-level reference run.
+Hosted real UI and tool-evidence checks passed: the downloadable report confirms
+Astra in both declared provenance and returned model usage, all eight primary
+conversation metrics are present, no-tool results are explicitly not applicable,
+and real tool traces complete the tool-use composite successfully.
 
 ## Files and data lifecycle
 
